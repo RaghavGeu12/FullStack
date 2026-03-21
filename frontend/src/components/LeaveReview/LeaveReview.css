@@ -1,0 +1,164 @@
+.leave-review-page {
+  min-height: 100vh;
+  background: var(--bg-beige);
+}
+
+.leave-review-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  margin-left: 200px;
+}
+
+.review-header {
+  margin-bottom: 30px;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.review-content {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 30px;
+}
+
+.orders-section,
+.review-form-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.orders-section h3,
+.review-form-section h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.order-card {
+  padding: 15px;
+  border: 2px solid var(--border-light);
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.order-card:hover {
+  border-color: var(--primary-orange);
+  background: #fff8f0;
+}
+
+.order-card.selected {
+  border-color: var(--primary-orange);
+  background: #fff8f0;
+  box-shadow: 0 2px 8px rgba(212, 133, 31, 0.2);
+}
+
+.order-info h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 5px;
+}
+
+.order-info p {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 3px;
+}
+
+.farmer-name {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.order-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-green);
+}
+
+.no-orders {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-light);
+}
+
+.order-detail {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 25px;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.rating-input {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.star {
+  background: none;
+  border: none;
+  font-size: 36px;
+  color: #ddd;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.star.active {
+  color: #ffa500;
+}
+
+.star:hover {
+  transform: scale(1.1);
+}
+
+.rating-text {
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.no-selection {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.no-selection-icon {
+  font-size: 60px;
+  margin-bottom: 15px;
+}
+
+.no-selection p {
+  font-size: 16px;
+  color: var(--text-light);
+}
+
+@media (max-width: 968px) {
+  .leave-review-container {
+    margin-left: 0;
+  }
+
+  .review-content {
+    grid-template-columns: 1fr;
+  }
+}
