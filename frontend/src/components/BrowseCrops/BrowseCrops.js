@@ -4,6 +4,24 @@ import api from '../../utils/api';
 import Navbar from '../Navbar/Navbar';
 import './BrowseCrops.css';
 
+// ── Star rating display ───────────────────────────────────────────────────────
+const StarRating = ({ rating, totalReviews }) => {
+  const filled = Math.round(rating);
+  return (
+    <div className="farmer-rating">
+      <div className="stars">
+        {[1, 2, 3, 4, 5].map((s) => (
+          <span key={s} className={s <= filled ? 'star filled' : 'star empty'}>★</span>
+        ))}
+      </div>
+      <span className="rating-text">
+        {rating > 0 ? `${rating.toFixed(1)}` : 'No ratings'}
+        {totalReviews > 0 && <span className="review-count"> ({totalReviews})</span>}
+      </span>
+    </div>
+  );
+};
+
 const BrowseCrops = () => {
   const navigate = useNavigate();
   const [crops, setCrops] = useState([]);
@@ -25,8 +43,8 @@ const BrowseCrops = () => {
     }
   };
 
-  const filteredCrops = filter === 'all' 
-    ? crops 
+  const filteredCrops = filter === 'all'
+    ? crops
     : crops.filter(crop => crop.category === filter);
 
   const categories = ['all', 'Grains', 'Vegetables', 'Fruits', 'Oilseeds'];
@@ -37,14 +55,9 @@ const BrowseCrops = () => {
 
   const getCropEmoji = (name) => {
     const emojiMap = {
-      'Wheat': '🌾',
-      'Rice': '🍚',
-      'Tomato': '🍅',
-      'Mango': '🥭',
-      'Mustard': '🌼',
-      'Onion': '🧅',
-      'Potato': '🥔',
-      'Cotton': '☁️'
+      'Wheat': '🌾', 'Rice': '🍚', 'Tomato': '🍅',
+      'Mango': '🥭', 'Mustard': '🌼', 'Onion': '🧅',
+      'Potato': '🥔', 'Cotton': '☁️'
     };
     return emojiMap[name] || '🌱';
   };
@@ -64,7 +77,7 @@ const BrowseCrops = () => {
   return (
     <div className="browse-crops">
       <Navbar />
-      
+
       <div className="browse-container">
         <div className="browse-header">
           <div>
@@ -102,7 +115,7 @@ const BrowseCrops = () => {
                   <h3 className="crop-name">{crop.name}</h3>
                   <p className="crop-category">{crop.category} · {crop.state}</p>
                   <p className="crop-price">₹{crop.price}/kg</p>
-                  
+
                   <div className="crop-meta">
                     <span className={`crop-status ${crop.status === 'Available' ? 'available' : 'sold-out'}`}>
                       {crop.status === 'Available' ? '✓' : '✕'} {crop.status}
@@ -112,7 +125,13 @@ const BrowseCrops = () => {
                     </p>
                   </div>
 
-                  <button 
+                  {/* ── Farmer Rating ── */}
+                  <StarRating
+                    rating={crop.farmerAvgRating ?? 0}
+                    totalReviews={crop.farmerTotalReviews ?? 0}
+                  />
+
+                  <button
                     className="btn-order"
                     onClick={() => handleOrderNow(crop._id)}
                     disabled={crop.status === 'Sold Out'}

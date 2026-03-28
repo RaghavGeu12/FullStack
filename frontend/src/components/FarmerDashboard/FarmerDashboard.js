@@ -5,6 +5,15 @@ import api from '../../utils/api';
 import Navbar from '../Navbar/Navbar';
 import './FarmerDashboard.css';
 
+// ── Reusable star display ─────────────────────────────────────────────────────
+const StarDisplay = ({ value }) => (
+  <div className="star-display">
+    {[1, 2, 3, 4, 5].map((s) => (
+      <span key={s} className={s <= Math.round(value) ? 'sd-filled' : 'sd-empty'}>★</span>
+    ))}
+  </div>
+);
+
 const FarmerDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -14,6 +23,12 @@ const FarmerDashboard = () => {
     totalOrders: 0,
     pendingOrders: 0,
     totalRevenue: 0
+  });
+  const [ratingStats, setRatingStats] = useState({
+    avgRating: 0,
+    avgQualityRating: 0,
+    avgCostRating: 0,
+    totalReviews: 0
   });
   const [recentCrops, setRecentCrops] = useState([]);
   const [recentOrders, setRecentOrders] = useState([]);
@@ -28,10 +43,14 @@ const FarmerDashboard = () => {
       // Fetch farmer's crops
       const cropsRes = await api.get('/crops/farmer/my-crops');
       const crops = cropsRes.data;
-      
+
       // Fetch farmer's orders
       const ordersRes = await api.get('/orders/farmer/orders');
       const orders = ordersRes.data;
+
+      // Fetch farmer's rating stats from reviews
+      const reviewRes = await api.get(`/reviews/farmer/${user._id}`);
+      const { avgRating, avgQualityRating, avgCostRating, totalReviews } = reviewRes.data;
 
       // Calculate stats
       const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
@@ -46,6 +65,13 @@ const FarmerDashboard = () => {
         totalRevenue
       });
 
+      setRatingStats({
+        avgRating:        avgRating        ?? 0,
+        avgQualityRating: avgQualityRating ?? 0,
+        avgCostRating:    avgCostRating    ?? 0,
+        totalReviews:     totalReviews     ?? 0,
+      });
+
       setRecentCrops(crops.slice(0, 4));
       setRecentOrders(orders.slice(0, 5));
       setLoading(false);
@@ -55,16 +81,21 @@ const FarmerDashboard = () => {
     }
   };
 
+  const getRatingBadge = (score) => {
+    if (score >= 4.5) return { label: 'Top Rated ⭐', color: '#15803d', bg: '#dcfce7' };
+    if (score >= 4.0) return { label: 'Highly Rated', color: '#0369a1', bg: '#e0f2fe' };
+    if (score >= 3.0) return { label: 'Good',         color: '#92400e', bg: '#fef3c7' };
+    if (score > 0)    return { label: 'Getting Started', color: '#6b7280', bg: '#f3f4f6' };
+    return              { label: 'No Reviews Yet',    color: '#6b7280', bg: '#f3f4f6' };
+  };
+
+  const badge = getRatingBadge(ratingStats.avgRating);
+
   const getCropEmoji = (name) => {
     const emojiMap = {
-      'Wheat': '🌾',
-      'Rice': '🍚',
-      'Tomato': '🍅',
-      'Mango': '🥭',
-      'Mustard': '🌼',
-      'Onion': '🧅',
-      'Potato': '🥔',
-      'Cotton': '☁️'
+      'Wheat': '🌾', 'Rice': '🍚', 'Tomato': '🍅',
+      'Mango': '🥭', 'Mustard': '🌼', 'Onion': '🧅',
+      'Potato': '🥔', 'Cotton': '☁️'
     };
     return emojiMap[name] || '🌱';
   };
@@ -89,19 +120,14 @@ const FarmerDashboard = () => {
   return (
     <div className="farmer-dashboard">
       <Navbar />
-      
+
       <div className="dashboard-container">
         <div className="dashboard-header">
           <div className="header-left">
-            <h1 className="welcome-title">
-              Hello, {user?.name} 🌾
-            </h1>
+            <h1 className="welcome-title">Hello, {user?.name} 🌾</h1>
             <p className="welcome-subtitle">Welcome to your AgriConnect Farmer Dashboard.</p>
           </div>
-          <button 
-            className="btn-add-crop"
-            onClick={() => navigate('/farmer/crops/new')}
-          >
+          <button className="btn-add-crop" onClick={() => navigate('/farmer/crops/new')}>
             + Add New Crop
           </button>
         </div>
@@ -149,16 +175,74 @@ const FarmerDashboard = () => {
           </div>
         </div>
 
+        {/* ── Rating Overview Card ───────────────────────────────────────────── */}
+        <div className="rating-overview-card">
+          <div className="rating-overview-left">
+            <h2 className="section-title">Your Farmer Rating</h2>
+            <p className="rating-overview-sub">Based on buyer reviews across all orders</p>
+
+            <div className="rating-big-row">
+              <span className="rating-big-number">{ratingStats.avgRating.toFixed(1)}</span>
+              <div>
+                <StarDisplay value={ratingStats.avgRating} />
+                <span className="rating-total-reviews">
+                  {ratingStats.totalReviews} review{ratingStats.totalReviews !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <span
+                className="rating-badge-pill"
+                style={{ color: badge.color, background: badge.bg }}
+              >
+                {badge.label}
+              </span>
+            </div>
+          </div>
+
+          <div className="rating-overview-right">
+            {/* Quality Rating Bar */}
+            <div className="rating-bar-row">
+              <span className="rbar-label">🌾 Crop Quality</span>
+              <div className="rbar-track">
+                <div
+                  className="rbar-fill"
+                  style={{
+                    width: `${(ratingStats.avgQualityRating / 5) * 100}%`,
+                    background: '#22c55e'
+                  }}
+                />
+              </div>
+              <span className="rbar-score green">
+                {ratingStats.avgQualityRating.toFixed(1)}
+              </span>
+            </div>
+
+            {/* Cost Rating Bar */}
+            <div className="rating-bar-row">
+              <span className="rbar-label">💰 Cost & Value</span>
+              <div className="rbar-track">
+                <div
+                  className="rbar-fill"
+                  style={{
+                    width: `${(ratingStats.avgCostRating / 5) * 100}%`,
+                    background: '#f59e0b'
+                  }}
+                />
+              </div>
+              <span className="rbar-score amber">
+                {ratingStats.avgCostRating.toFixed(1)}
+              </span>
+            </div>
+          </div>
+        </div>
+        {/* ─────────────────────────────────────────────────────────────────── */}
+
         {/* Two Column Layout */}
         <div className="dashboard-content">
           {/* My Crops Section */}
           <div className="section-card">
             <div className="section-header">
               <h2 className="section-title">My Crops</h2>
-              <button 
-                className="btn-view-all"
-                onClick={() => navigate('/farmer/crops')}
-              >
+              <button className="btn-view-all" onClick={() => navigate('/farmer/crops')}>
                 View All →
               </button>
             </div>
@@ -166,10 +250,7 @@ const FarmerDashboard = () => {
             {recentCrops.length === 0 ? (
               <div className="empty-state">
                 <p>No crops listed yet.</p>
-                <button 
-                  className="btn-add"
-                  onClick={() => navigate('/farmer/crops/new')}
-                >
+                <button className="btn-add" onClick={() => navigate('/farmer/crops/new')}>
                   Add Your First Crop
                 </button>
               </div>
@@ -177,9 +258,7 @@ const FarmerDashboard = () => {
               <div className="crops-list">
                 {recentCrops.map((crop) => (
                   <div key={crop._id} className="crop-item">
-                    <div className="crop-icon-small">
-                      {getCropEmoji(crop.name)}
-                    </div>
+                    <div className="crop-icon-small">{getCropEmoji(crop.name)}</div>
                     <div className="crop-info">
                       <h4>{crop.name}</h4>
                       <p className="crop-details">
@@ -199,10 +278,7 @@ const FarmerDashboard = () => {
           <div className="section-card">
             <div className="section-header">
               <h2 className="section-title">Recent Orders</h2>
-              <button 
-                className="btn-view-all"
-                onClick={() => navigate('/farmer/orders')}
-              >
+              <button className="btn-view-all" onClick={() => navigate('/farmer/orders')}>
                 View All →
               </button>
             </div>
@@ -224,9 +300,7 @@ const FarmerDashboard = () => {
                       </div>
                       <div className="order-right">
                         <p className="order-price">₹{order.totalPrice.toLocaleString()}</p>
-                        <span className={`status-badge ${order.status}`}>
-                          {order.status}
-                        </span>
+                        <span className={`status-badge ${order.status}`}>{order.status}</span>
                       </div>
                     </div>
                     <p className="order-date">{formatDate(order.orderDate)}</p>
@@ -241,24 +315,15 @@ const FarmerDashboard = () => {
         <div className="quick-actions">
           <h2 className="section-title">Quick Actions</h2>
           <div className="actions-grid">
-            <button 
-              className="action-card"
-              onClick={() => navigate('/farmer/crops/new')}
-            >
+            <button className="action-card" onClick={() => navigate('/farmer/crops/new')}>
               <span className="action-icon">➕</span>
               <span className="action-label">Add New Crop</span>
             </button>
-            <button 
-              className="action-card"
-              onClick={() => navigate('/farmer/crops')}
-            >
+            <button className="action-card" onClick={() => navigate('/farmer/crops')}>
               <span className="action-icon">📝</span>
               <span className="action-label">Manage Crops</span>
             </button>
-            <button 
-              className="action-card"
-              onClick={() => navigate('/farmer/orders')}
-            >
+            <button className="action-card" onClick={() => navigate('/farmer/orders')}>
               <span className="action-icon">📦</span>
               <span className="action-label">View Orders</span>
             </button>

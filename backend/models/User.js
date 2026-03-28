@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['farmer', 'buyer', 'admin'],  // ✅ CHANGED: Added 'admin'
+    enum: ['farmer', 'buyer', 'admin'],
     required: [true, 'Please specify role']
   },
   phone: {
@@ -38,11 +38,34 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  status: {  // ✅ NEW: Added status field for blocking users
+  status: {
     type: String,
     enum: ['Active', 'Blocked'],
     default: 'Active'
   },
+
+  // ── Farmer rating averages (updated by aggregation pipeline after every review) ──
+  // Example: Buyer1 rates quality:3, cost:3 → Buyer2 rates quality:5, cost:5
+  //   avgQualityRating = (3+5)/2 = 4.0
+  //   avgCostRating    = (3+5)/2 = 4.0
+  //   avgRating        = (4.0+4.0)/2 = 4.0  ⭐⭐⭐⭐
+  avgRating: {
+    type: Number,
+    default: 0
+  },
+  avgQualityRating: {
+    type: Number,
+    default: 0
+  },
+  avgCostRating: {
+    type: Number,
+    default: 0
+  },
+  totalReviews: {
+    type: Number,
+    default: 0
+  },
+
   createdAt: {
     type: Date,
     default: Date.now

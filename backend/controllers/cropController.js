@@ -1,43 +1,74 @@
 const Crop = require('../models/Crop');
 
-// @desc    Get all crops
+// @desc    Get all crops (with farmer rating fields)
 // @route   GET /api/crops
 // @access  Public
 const getCrops = async (req, res) => {
   try {
-    const crops = await Crop.find().populate('farmer', 'name email phone');
-    res.json(crops);
+    const crops = await Crop.find()
+      .populate('farmer', 'name email phone avgRating avgQualityRating avgCostRating totalReviews');
+
+    // Flatten farmer rating fields onto each crop so frontend
+    // can access crop.farmerAvgRating directly without nested lookup
+    const cropsWithRating = crops.map((crop) => ({
+      ...crop.toObject(),
+      farmerAvgRating:        crop.farmer?.avgRating        ?? 0,
+      farmerAvgQualityRating: crop.farmer?.avgQualityRating ?? 0,
+      farmerAvgCostRating:    crop.farmer?.avgCostRating    ?? 0,
+      farmerTotalReviews:     crop.farmer?.totalReviews     ?? 0,
+    }));
+
+    res.json(cropsWithRating);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// @desc    Get featured crops (limit to 6)
+// @desc    Get featured crops (limit to 6, with farmer rating fields)
 // @route   GET /api/crops/featured
 // @access  Public
 const getFeaturedCrops = async (req, res) => {
   try {
     const crops = await Crop.find({ status: 'Available' })
       .limit(6)
-      .populate('farmer', 'name email phone');
-    res.json(crops);
+      .populate('farmer', 'name email phone avgRating avgQualityRating avgCostRating totalReviews');
+
+    const cropsWithRating = crops.map((crop) => ({
+      ...crop.toObject(),
+      farmerAvgRating:        crop.farmer?.avgRating        ?? 0,
+      farmerAvgQualityRating: crop.farmer?.avgQualityRating ?? 0,
+      farmerAvgCostRating:    crop.farmer?.avgCostRating    ?? 0,
+      farmerTotalReviews:     crop.farmer?.totalReviews     ?? 0,
+    }));
+
+    res.json(cropsWithRating);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// @desc    Get single crop
+// @desc    Get single crop (with farmer rating fields)
 // @route   GET /api/crops/:id
 // @access  Public
 const getCropById = async (req, res) => {
   try {
-    const crop = await Crop.findById(req.params.id).populate('farmer', 'name email phone');
-    
+    const crop = await Crop.findById(req.params.id)
+      .populate('farmer', 'name email phone avgRating avgQualityRating avgCostRating totalReviews');
+
     if (!crop) {
       return res.status(404).json({ message: 'Crop not found' });
     }
-    
-    res.json(crop);
+
+    // Flatten rating fields here too (useful for PlaceOrder page)
+    const cropObj = {
+      ...crop.toObject(),
+      farmerAvgRating:        crop.farmer?.avgRating        ?? 0,
+      farmerAvgQualityRating: crop.farmer?.avgQualityRating ?? 0,
+      farmerAvgCostRating:    crop.farmer?.avgCostRating    ?? 0,
+      farmerTotalReviews:     crop.farmer?.totalReviews     ?? 0,
+    };
+
+    res.json(cropObj);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -81,7 +112,6 @@ const updateCrop = async (req, res) => {
       return res.status(404).json({ message: 'Crop not found' });
     }
 
-    // Make sure user is crop owner
     if (crop.farmer.toString() !== req.user._id.toString()) {
       return res.status(401).json({ message: 'Not authorized to update this crop' });
     }
@@ -109,7 +139,6 @@ const deleteCrop = async (req, res) => {
       return res.status(404).json({ message: 'Crop not found' });
     }
 
-    // Make sure user is crop owner
     if (crop.farmer.toString() !== req.user._id.toString()) {
       return res.status(401).json({ message: 'Not authorized to delete this crop' });
     }
@@ -121,7 +150,7 @@ const deleteCrop = async (req, res) => {
   }
 };
 
-// @desc    Get farmer's crops
+// @desc    Get farmer's own crops
 // @route   GET /api/crops/farmer/my-crops
 // @access  Private (Farmer only)
 const getFarmerCrops = async (req, res) => {

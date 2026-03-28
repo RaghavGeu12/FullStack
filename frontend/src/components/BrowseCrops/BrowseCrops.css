@@ -115,7 +115,7 @@
 }
 
 .crop-meta {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .crop-status {
@@ -142,6 +142,48 @@
   color: var(--text-light);
   margin-top: 6px;
 }
+
+/* ── Farmer Rating Stars ──────────────────────────────── */
+.farmer-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 7px 10px;
+  background: #fffbeb;
+  border-radius: 8px;
+  border: 1px solid #fde68a;
+}
+
+.stars {
+  display: flex;
+  gap: 1px;
+}
+
+.star {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.star.filled {
+  color: #f59e0b;
+}
+
+.star.empty {
+  color: #d1d5db;
+}
+
+.rating-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.review-count {
+  font-weight: 400;
+  color: #a0aec0;
+}
+/* ─────────────────────────────────────────────────────── */
 
 .btn-order {
   width: 100%;
