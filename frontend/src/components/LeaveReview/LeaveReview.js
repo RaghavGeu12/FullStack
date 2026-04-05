@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import api from '../../utils/api';
 import Navbar from '../Navbar/Navbar';
 import './LeaveReview.css';
@@ -31,6 +32,7 @@ const StarRating = ({ label, icon, value, onChange, color }) => (
 );
 
 const LeaveReview = () => {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -51,7 +53,7 @@ const LeaveReview = () => {
       const completedOrders = data.filter(order => order.status === 'completed');
       setOrders(completedOrders);
     } catch (error) {
-      toast.error('Failed to fetch orders');
+      toast.error(t('leaveReview.errorFetch'));
     } finally {
       setLoading(false);
     }
@@ -59,8 +61,8 @@ const LeaveReview = () => {
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-    if (!selectedOrder) return toast.error('Please select an order to review');
-    if (!comment.trim()) return toast.error('Please write a review comment');
+    if (!selectedOrder) return toast.error(t('leaveReview.errorNoOrder'));
+    if (!comment.trim()) return toast.error(t('leaveReview.errorNoComment'));
 
     setSubmitting(true);
     try {
@@ -69,17 +71,17 @@ const LeaveReview = () => {
         farmerId: selectedOrder.farmer,
         qualityRating,
         costRating,
-        rating: parseFloat(averageRating), // overall average stored for backward compat
+        rating: parseFloat(averageRating),
         comment,
       });
-      toast.success('Review submitted successfully!');
+      toast.success(t('leaveReview.successMsg'));
       setSelectedOrder(null);
       setQualityRating(5);
       setCostRating(5);
       setComment('');
       fetchCompletedOrders();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to submit review');
+      toast.error(error.response?.data?.message || t('leaveReview.errorSubmit'));
     } finally {
       setSubmitting(false);
     }
@@ -91,7 +93,7 @@ const LeaveReview = () => {
         <Navbar />
         <div className="loading-container">
           <div className="spinner" />
-          <p>Loading your orders...</p>
+          <p>{t('leaveReview.loading')}</p>
         </div>
       </div>
     );
@@ -102,18 +104,18 @@ const LeaveReview = () => {
       <Navbar />
       <div className="leave-review-container">
         <div className="review-header">
-          <h1 className="page-title">Leave a Review</h1>
-          <p className="page-subtitle">Rate crop quality & value to help other buyers</p>
+          <h1 className="page-title">{t('leaveReview.title')}</h1>
+          <p className="page-subtitle">{t('leaveReview.subtitle')}</p>
         </div>
 
         <div className="review-content">
           {/* Orders List */}
           <div className="orders-section">
-            <h3 className="section-heading">Completed Orders</h3>
+            <h3 className="section-heading">{t('leaveReview.completedOrders')}</h3>
             {orders.length === 0 ? (
               <div className="no-orders">
                 <span>🌾</span>
-                <p>No completed orders to review yet</p>
+                <p>{t('leaveReview.noOrders')}</p>
               </div>
             ) : (
               <div className="orders-list">
@@ -128,13 +130,15 @@ const LeaveReview = () => {
                       <div className="order-info">
                         <h4>{order.cropName}</h4>
                         <p className="order-meta">{order.orderId} · {order.quantity} kg</p>
-                        <p className="farmer-name">👨‍🌾 {order.farmerName}</p>
+                        <p className="farmer-name">
+                          👨‍🌾 {t('leaveReview.farmer', { name: order.farmerName })}
+                        </p>
                       </div>
                     </div>
                     <div className="order-right">
                       <div className="order-price">₹{order.totalPrice.toLocaleString()}</div>
                       {order.reviewed && (
-                        <span className="reviewed-badge">Reviewed</span>
+                        <span className="reviewed-badge">{t('leaveReview.reviewed')}</span>
                       )}
                     </div>
                   </div>
@@ -149,18 +153,23 @@ const LeaveReview = () => {
               <>
                 <div className="review-for-header">
                   <div>
-                    <h3>Reviewing <span className="highlight">{selectedOrder.farmerName}</span></h3>
-                    <p className="order-detail-chip">{selectedOrder.orderId} · {selectedOrder.cropName} · {selectedOrder.quantity} kg</p>
+                    <h3>
+                      {t('leaveReview.reviewing')}{' '}
+                      <span className="highlight">{selectedOrder.farmerName}</span>
+                    </h3>
+                    <p className="order-detail-chip">
+                      {selectedOrder.orderId} · {selectedOrder.cropName} · {selectedOrder.quantity} kg
+                    </p>
                   </div>
                 </div>
 
                 <form onSubmit={handleSubmitReview} className="review-form">
                   {/* Dual Rating */}
                   <div className="form-group ratings-group">
-                    <label className="group-label">Rate Your Experience</label>
+                    <label className="group-label">{t('leaveReview.rateExperience')}</label>
                     <div className="dual-ratings">
                       <StarRating
-                        label="Crop Quality"
+                        label={t('leaveReview.cropQuality')}
                         icon="🌾"
                         value={qualityRating}
                         onChange={setQualityRating}
@@ -168,7 +177,7 @@ const LeaveReview = () => {
                       />
                       <div className="ratings-divider" />
                       <StarRating
-                        label="Cost & Value"
+                        label={t('leaveReview.costValue')}
                         icon="💰"
                         value={costRating}
                         onChange={setCostRating}
@@ -178,11 +187,11 @@ const LeaveReview = () => {
 
                     {/* Overall average pill */}
                     <div className="overall-rating">
-                      <span className="overall-label">Overall Rating</span>
+                      <span className="overall-label">{t('leaveReview.overallRating')}</span>
                       <div className="overall-score">
                         <span className="score-number">{averageRating}</span>
                         <span className="score-stars">
-                          {[1,2,3,4,5].map(s => (
+                          {[1, 2, 3, 4, 5].map(s => (
                             <span key={s} className={s <= Math.round(averageRating) ? 'star-filled' : 'star-empty'}>★</span>
                           ))}
                         </span>
@@ -192,13 +201,13 @@ const LeaveReview = () => {
 
                   {/* Comment */}
                   <div className="form-group">
-                    <label htmlFor="comment">Your Review</label>
+                    <label htmlFor="comment">{t('leaveReview.yourReview')}</label>
                     <textarea
                       id="comment"
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
                       rows="4"
-                      placeholder="Share details about crop quality, delivery, and value for money..."
+                      placeholder={t('leaveReview.placeholder')}
                       required
                     />
                     <span className="char-count">{comment.length} chars</span>
@@ -215,10 +224,10 @@ const LeaveReview = () => {
                         setComment('');
                       }}
                     >
-                      Cancel
+                      {t('leaveReview.cancel')}
                     </button>
                     <button type="submit" className="btn-submit" disabled={submitting}>
-                      {submitting ? 'Submitting...' : 'Submit Review ✓'}
+                      {submitting ? t('leaveReview.submitting') : t('leaveReview.submit')}
                     </button>
                   </div>
                 </form>
@@ -226,7 +235,7 @@ const LeaveReview = () => {
             ) : (
               <div className="no-selection">
                 <div className="no-selection-icon">⭐</div>
-                <p>Select a completed order from the left to leave your review</p>
+                <p>{t('leaveReview.selectOrder')}</p>
               </div>
             )}
           </div>

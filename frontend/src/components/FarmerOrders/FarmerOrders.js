@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import api from '../../utils/api';
 import Navbar from '../Navbar/Navbar';
 import './FarmerOrders.css';
 
 const FarmerOrders = () => {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -19,7 +21,7 @@ const FarmerOrders = () => {
       setOrders(data);
       setLoading(false);
     } catch (error) {
-      toast.error('Failed to fetch orders');
+      toast.error(t('farmerOrders.errorFetch'));
       setLoading(false);
     }
   };
@@ -27,24 +29,24 @@ const FarmerOrders = () => {
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
       await api.put(`/orders/${orderId}/status`, { status: newStatus });
-      toast.success(`Order marked as ${newStatus}`);
+      toast.success(t('farmerOrders.successStatus', { status: newStatus }));
       fetchOrders();
     } catch (error) {
-      toast.error('Failed to update order status');
+      toast.error(t('farmerOrders.errorUpdate'));
     }
   };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   };
 
-  const filteredOrders = filter === 'all' 
-    ? orders 
+  const filteredOrders = filter === 'all'
+    ? orders
     : orders.filter(order => order.status === filter);
 
   if (loading) {
@@ -53,7 +55,7 @@ const FarmerOrders = () => {
         <Navbar />
         <div className="loading-container">
           <div className="spinner"></div>
-          <p>Loading orders...</p>
+          <p>{t('farmerOrders.loading')}</p>
         </div>
       </div>
     );
@@ -62,12 +64,12 @@ const FarmerOrders = () => {
   return (
     <div className="farmer-orders-page">
       <Navbar />
-      
+
       <div className="farmer-orders-container">
         <div className="orders-header">
           <div>
-            <h1 className="page-title">My Orders 📦</h1>
-            <p className="page-subtitle">Manage orders from buyers</p>
+            <h1 className="page-title">{t('farmerOrders.title')}</h1>
+            <p className="page-subtitle">{t('farmerOrders.subtitle')}</p>
           </div>
         </div>
 
@@ -76,47 +78,51 @@ const FarmerOrders = () => {
             className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
             onClick={() => setFilter('all')}
           >
-            All ({orders.length})
+            {t('farmerOrders.all', { count: orders.length })}
           </button>
           <button
             className={`filter-btn ${filter === 'pending' ? 'active' : ''}`}
             onClick={() => setFilter('pending')}
           >
-            Pending ({orders.filter(o => o.status === 'pending').length})
+            {t('farmerOrders.pending', { count: orders.filter(o => o.status === 'pending').length })}
           </button>
           <button
             className={`filter-btn ${filter === 'confirmed' ? 'active' : ''}`}
             onClick={() => setFilter('confirmed')}
           >
-            Confirmed ({orders.filter(o => o.status === 'confirmed').length})
+            {t('farmerOrders.confirmed', { count: orders.filter(o => o.status === 'confirmed').length })}
           </button>
           <button
             className={`filter-btn ${filter === 'completed' ? 'active' : ''}`}
             onClick={() => setFilter('completed')}
           >
-            Completed ({orders.filter(o => o.status === 'completed').length})
+            {t('farmerOrders.completed', { count: orders.filter(o => o.status === 'completed').length })}
           </button>
         </div>
 
         {filteredOrders.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📦</div>
-            <h3>No orders found</h3>
-            <p>{filter === 'all' ? 'No orders received yet' : `No ${filter} orders`}</p>
+            <h3>{t('farmerOrders.noOrders')}</h3>
+            <p>
+              {filter === 'all'
+                ? t('farmerOrders.noOrdersAll')
+                : t('farmerOrders.noOrdersFilter', { filter })}
+            </p>
           </div>
         ) : (
           <div className="orders-table-container">
             <table className="orders-table">
               <thead>
                 <tr>
-                  <th>ORDER ID</th>
-                  <th>BUYER</th>
-                  <th>CROP</th>
-                  <th>QTY</th>
-                  <th>TOTAL</th>
-                  <th>DATE</th>
-                  <th>STATUS</th>
-                  <th>ACTIONS</th>
+                  <th>{t('farmerOrders.orderId')}</th>
+                  <th>{t('farmerOrders.buyer')}</th>
+                  <th>{t('farmerOrders.crop')}</th>
+                  <th>{t('farmerOrders.qty')}</th>
+                  <th>{t('farmerOrders.total')}</th>
+                  <th>{t('farmerOrders.date')}</th>
+                  <th>{t('farmerOrders.status')}</th>
+                  <th>{t('farmerOrders.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -130,7 +136,7 @@ const FarmerOrders = () => {
                       </div>
                     </td>
                     <td className="crop-name">{order.cropName}</td>
-                    <td>{order.quantity} kg</td>
+                    <td>{t('farmerOrders.quantityKg', { qty: order.quantity })}</td>
                     <td className="total-price">₹{order.totalPrice.toLocaleString()}</td>
                     <td>{formatDate(order.orderDate)}</td>
                     <td>
@@ -145,7 +151,7 @@ const FarmerOrders = () => {
                             className="btn-confirm"
                             onClick={() => handleUpdateStatus(order._id, 'confirmed')}
                           >
-                            Confirm
+                            {t('farmerOrders.confirm')}
                           </button>
                         )}
                         {order.status === 'confirmed' && (
@@ -153,11 +159,13 @@ const FarmerOrders = () => {
                             className="btn-complete"
                             onClick={() => handleUpdateStatus(order._id, 'completed')}
                           >
-                            Complete
+                            {t('farmerOrders.complete')}
                           </button>
                         )}
                         {order.status === 'completed' && (
-                          <span className="completed-text">✓ Done</span>
+                          <span className="completed-text">
+                            {t('farmerOrders.done')}
+                          </span>
                         )}
                       </div>
                     </td>

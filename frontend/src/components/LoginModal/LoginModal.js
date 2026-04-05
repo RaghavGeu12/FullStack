@@ -1,27 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import './LoginModal.css';
 
 const LoginModal = ({ type, onClose }) => {
   const navigate = useNavigate();
   const { login, register } = useAuth();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('signin');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const [signInData, setSignInData] = useState({
-    email: '',
-    password: ''
-  });
-
+  const [signInData, setSignInData] = useState({ email: '', password: '' });
   const [signUpData, setSignUpData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    phone: '',
-    address: '',
-    state: ''
+    name: '', email: '', password: '', phone: '', address: '', state: ''
   });
 
   const isFarmer = type === 'farmer';
@@ -32,11 +25,8 @@ const LoginModal = ({ type, onClose }) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     const result = await login(signInData.email, signInData.password, type);
-    
     setLoading(false);
-    
     if (result.success) {
       onClose();
       navigate(isFarmer ? '/farmer/dashboard' : '/buyer/dashboard');
@@ -49,14 +39,8 @@ const LoginModal = ({ type, onClose }) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
-    const result = await register({
-      ...signUpData,
-      role: type
-    });
-    
+    const result = await register({ ...signUpData, role: type });
     setLoading(false);
-    
     if (result.success) {
       onClose();
       navigate(isFarmer ? '/farmer/dashboard' : '/buyer/dashboard');
@@ -66,40 +50,40 @@ const LoginModal = ({ type, onClose }) => {
   };
 
   const useDemoCredentials = () => {
-    setSignInData({
-      email: demoEmail,
-      password: demoPassword
-    });
+    setSignInData({ email: demoEmail, password: demoPassword });
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className={`modal-content ${isFarmer ? 'farmer-modal' : 'buyer-modal'}`} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`modal-content ${isFarmer ? 'farmer-modal' : 'buyer-modal'}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button className="modal-close" onClick={onClose}>×</button>
-        
+
         <div className="modal-header">
           <span className="modal-icon">{isFarmer ? '🌱' : '🛒'}</span>
-          <span className="modal-badge">{isFarmer ? 'FARMER PORTAL' : 'BUYER PORTAL'}</span>
-          <h2 className="modal-title">Welcome Back</h2>
+          <span className="modal-badge">
+            {isFarmer ? t('loginModal.farmerPortal') : t('loginModal.buyerPortal')}
+          </span>
+          <h2 className="modal-title">{t('loginModal.welcomeBack')}</h2>
           <p className="modal-subtitle">
-            {isFarmer 
-              ? 'Manage your crops, track orders, get fair prices.' 
-              : 'Browse fresh crops, place orders, review farmers.'}
+            {isFarmer ? t('loginModal.farmerSubtitle') : t('loginModal.buyerSubtitle')}
           </p>
         </div>
 
         <div className="modal-tabs">
-          <button 
+          <button
             className={`tab ${activeTab === 'signin' ? 'active' : ''}`}
             onClick={() => setActiveTab('signin')}
           >
-            Sign In
+            {t('loginModal.signIn')}
           </button>
-          <button 
+          <button
             className={`tab ${activeTab === 'register' ? 'active' : ''}`}
             onClick={() => setActiveTab('register')}
           >
-            Register
+            {t('loginModal.register')}
           </button>
         </div>
 
@@ -108,113 +92,113 @@ const LoginModal = ({ type, onClose }) => {
         {activeTab === 'signin' ? (
           <form className="modal-form" onSubmit={handleSignIn}>
             <div className="form-group">
-              <label>EMAIL ADDRESS</label>
+              <label>{t('loginModal.emailLabel')}</label>
               <input
                 type="email"
-                placeholder="buyer@example.com"
+                placeholder={t('loginModal.emailPlaceholder')}
                 value={signInData.email}
-                onChange={(e) => setSignInData({...signInData, email: e.target.value})}
+                onChange={(e) => setSignInData({ ...signInData, email: e.target.value })}
                 required
               />
             </div>
 
             <div className="form-group">
-              <label>PASSWORD</label>
+              <label>{t('loginModal.passwordLabel')}</label>
               <input
                 type="password"
-                placeholder="Your password"
+                placeholder={t('loginModal.passwordPlaceholder')}
                 value={signInData.password}
-                onChange={(e) => setSignInData({...signInData, password: e.target.value})}
+                onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
                 required
               />
             </div>
 
             <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? 'Signing in...' : `Sign In as ${isFarmer ? 'Farmer' : 'Buyer'}`} →
+              {loading
+                ? t('loginModal.signingIn')
+                : t('loginModal.signInBtn', {
+                    role: isFarmer ? t('auth.farmer') : t('auth.buyer')
+                  })}
             </button>
 
             <div className="demo-credentials">
-              <p className="demo-label">Demo Credentials</p>
+              <p className="demo-label">{t('loginModal.demoCredentials')}</p>
               <p className="demo-info">
-                Email: <strong>{demoEmail}</strong> | Password: <strong>{demoPassword}</strong>
+                {t('loginModal.demoInfo', { email: demoEmail, password: demoPassword })}
               </p>
-              <button 
-                type="button" 
-                className="btn-demo"
-                onClick={useDemoCredentials}
-              >
-                Use Demo Credentials
+              <button type="button" className="btn-demo" onClick={useDemoCredentials}>
+                {t('loginModal.useDemoBtn')}
               </button>
             </div>
           </form>
         ) : (
           <form className="modal-form" onSubmit={handleSignUp}>
             <div className="form-group">
-              <label>FULL NAME</label>
+              <label>{t('loginModal.fullNameLabel')}</label>
               <input
                 type="text"
-                placeholder="John Doe"
+                placeholder={t('loginModal.fullNamePlaceholder')}
                 value={signUpData.name}
-                onChange={(e) => setSignUpData({...signUpData, name: e.target.value})}
+                onChange={(e) => setSignUpData({ ...signUpData, name: e.target.value })}
                 required
               />
             </div>
 
             <div className="form-group">
-              <label>EMAIL ADDRESS</label>
+              <label>{t('loginModal.emailLabel')}</label>
               <input
                 type="email"
-                placeholder="john@example.com"
+                placeholder={t('loginModal.emailRegPlaceholder')}
                 value={signUpData.email}
-                onChange={(e) => setSignUpData({...signUpData, email: e.target.value})}
+                onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
                 required
               />
             </div>
 
             <div className="form-group">
-              <label>PASSWORD</label>
+              <label>{t('loginModal.passwordLabel')}</label>
               <input
                 type="password"
-                placeholder="Create password (min 6 characters)"
+                placeholder={t('loginModal.passwordRegPlaceholder')}
                 value={signUpData.password}
-                onChange={(e) => setSignUpData({...signUpData, password: e.target.value})}
+                onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
                 required
                 minLength={6}
               />
             </div>
 
             <div className="form-group">
-              <label>PHONE NUMBER</label>
+              <label>{t('loginModal.phoneLabel')}</label>
               <input
                 type="tel"
-                placeholder="9876543210"
+                placeholder={t('loginModal.phonePlaceholder')}
                 value={signUpData.phone}
-                onChange={(e) => setSignUpData({...signUpData, phone: e.target.value})}
+                onChange={(e) => setSignUpData({ ...signUpData, phone: e.target.value })}
               />
             </div>
 
             <div className="form-group">
-              <label>ADDRESS</label>
+              <label>{t('loginModal.addressLabel')}</label>
               <input
                 type="text"
-                placeholder="Your address"
+                placeholder={t('loginModal.addressPlaceholder')}
                 value={signUpData.address}
-                onChange={(e) => setSignUpData({...signUpData, address: e.target.value})}
+                onChange={(e) => setSignUpData({ ...signUpData, address: e.target.value })}
               />
             </div>
 
             <div className="form-group">
-              <label>STATE</label>
+              <label>{t('loginModal.stateLabel')}</label>
               <input
                 type="text"
-                placeholder="e.g., Punjab, Maharashtra"
+                placeholder={t('loginModal.statePlaceholder')}
                 value={signUpData.state}
-                onChange={(e) => setSignUpData({...signUpData, state: e.target.value})}
+                onChange={(e) => setSignUpData({ ...signUpData, state: e.target.value })}
               />
             </div>
 
             <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? 'Creating account...' : 'Create Account'} →
+              {loading ? t('loginModal.creatingAccount') : t('loginModal.createAccount')}
             </button>
           </form>
         )}

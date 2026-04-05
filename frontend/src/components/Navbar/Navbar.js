@@ -1,12 +1,15 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../LanguageSwitcher';
 import './Navbar.css';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     logout();
@@ -17,14 +20,14 @@ const Navbar = () => {
   const basePath = isFarmer ? '/farmer' : '/buyer';
 
   const navItems = isFarmer ? [
-    { path: '/farmer/dashboard', label: 'Overview', icon: '📊' },
-    { path: '/farmer/crops', label: 'My Crops', icon: '🌾' },
-    { path: '/farmer/orders', label: 'Orders', icon: '📦' }
+    { path: '/farmer/dashboard', label: t('nav.overview'), icon: '📊' },
+    { path: '/farmer/crops', label: t('nav.mycrops'), icon: '🌾' },
+    { path: '/farmer/orders', label: t('nav.orders'), icon: '📦' }
   ] : [
-    { path: '/buyer/dashboard', label: 'Overview', icon: '📊' },
-    { path: '/buyer/browse', label: 'Browse Crops', icon: '🛒' },
-    { path: '/buyer/orders', label: 'My Orders', icon: '📦' },
-    { path: '/buyer/reviews', label: 'Leave Review', icon: '⭐' }
+    { path: '/buyer/dashboard', label: t('nav.overview'), icon: '📊' },
+    { path: '/buyer/browse', label: t('nav.browse'), icon: '🛒' },
+    { path: '/buyer/orders', label: t('nav.myorders'), icon: '📦' },
+    { path: '/buyer/reviews', label: t('nav.review'), icon: '⭐' }
   ];
 
   return (
@@ -44,11 +47,14 @@ const Navbar = () => {
               </div>
               <div className="user-details">
                 <span className="user-name">{user?.name}</span>
-                <span className="user-role">{isFarmer ? 'Farmer' : 'Buyer'}</span>
+                <span className="user-role">
+                  {isFarmer ? t('auth.farmer') : t('auth.buyer')}
+                </span>
               </div>
             </div>
+            <LanguageSwitcher />
             <button className="btn-logout" onClick={handleLogout}>
-              Logout
+              {t('nav.logout')}
             </button>
           </div>
         </div>

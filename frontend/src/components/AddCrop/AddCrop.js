@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import api from '../../utils/api';
 import Navbar from '../Navbar/Navbar';
 import './AddCrop.css';
 
 const AddCrop = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -29,22 +31,19 @@ const AddCrop = () => {
   ];
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.name || !formData.price || !formData.quantity || !formData.location || !formData.state) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('addCrop.errorRequired'));
       return;
     }
 
     if (formData.price <= 0 || formData.quantity <= 0) {
-      toast.error('Price and quantity must be greater than 0');
+      toast.error(t('addCrop.errorPrice'));
       return;
     }
 
@@ -57,10 +56,10 @@ const AddCrop = () => {
         quantity: parseFloat(formData.quantity)
       });
 
-      toast.success('Crop added successfully!');
+      toast.success(t('addCrop.successMsg'));
       navigate('/farmer/crops');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to add crop');
+      toast.error(error.response?.data?.message || t('addCrop.errorFailed'));
       setLoading(false);
     }
   };
@@ -68,34 +67,34 @@ const AddCrop = () => {
   return (
     <div className="add-crop-page">
       <Navbar />
-      
+
       <div className="add-crop-container">
         <div className="add-crop-header">
           <button className="btn-back" onClick={() => navigate('/farmer/dashboard')}>
-            ← Back
+            {t('addCrop.back')}
           </button>
-          <h1 className="page-title">Add New Crop</h1>
-          <p className="page-subtitle">List your agricultural products for buyers</p>
+          <h1 className="page-title">{t('addCrop.title')}</h1>
+          <p className="page-subtitle">{t('addCrop.subtitle')}</p>
         </div>
 
         <div className="add-crop-card">
           <form onSubmit={handleSubmit} className="crop-form">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="name">Crop Name *</label>
+                <label htmlFor="name">{t('addCrop.cropName')}</label>
                 <input
                   type="text"
                   id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="e.g., Wheat, Rice, Tomato"
+                  placeholder={t('addCrop.cropNamePlaceholder')}
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="category">Category *</label>
+                <label htmlFor="category">{t('addCrop.category')}</label>
                 <select
                   id="category"
                   name="category"
@@ -112,14 +111,14 @@ const AddCrop = () => {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="price">Price per kg (₹) *</label>
+                <label htmlFor="price">{t('addCrop.price')}</label>
                 <input
                   type="number"
                   id="price"
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
-                  placeholder="Enter price"
+                  placeholder={t('addCrop.pricePlaceholder')}
                   min="0"
                   step="0.01"
                   required
@@ -127,14 +126,14 @@ const AddCrop = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="quantity">Quantity (kg) *</label>
+                <label htmlFor="quantity">{t('addCrop.quantity')}</label>
                 <input
                   type="number"
                   id="quantity"
                   name="quantity"
                   value={formData.quantity}
                   onChange={handleChange}
-                  placeholder="Enter quantity"
+                  placeholder={t('addCrop.quantityPlaceholder')}
                   min="0"
                   step="1"
                   required
@@ -144,20 +143,20 @@ const AddCrop = () => {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="location">Location/City *</label>
+                <label htmlFor="location">{t('addCrop.location')}</label>
                 <input
                   type="text"
                   id="location"
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  placeholder="e.g., Ludhiana, Mumbai"
+                  placeholder={t('addCrop.locationPlaceholder')}
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="state">State *</label>
+                <label htmlFor="state">{t('addCrop.state')}</label>
                 <select
                   id="state"
                   name="state"
@@ -165,7 +164,7 @@ const AddCrop = () => {
                   onChange={handleChange}
                   required
                 >
-                  <option value="">Select State</option>
+                  <option value="">{t('addCrop.selectState')}</option>
                   {states.map((state) => (
                     <option key={state} value={state}>{state}</option>
                   ))}
@@ -174,31 +173,31 @@ const AddCrop = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="description">Description (Optional)</label>
+              <label htmlFor="description">{t('addCrop.description')}</label>
               <textarea
                 id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Add details about your crop quality, farming methods, etc."
+                placeholder={t('addCrop.descriptionPlaceholder')}
                 rows="4"
               />
             </div>
 
             <div className="form-actions">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn-cancel"
                 onClick={() => navigate('/farmer/dashboard')}
               >
-                Cancel
+                {t('addCrop.cancel')}
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn-submit"
                 disabled={loading}
               >
-                {loading ? 'Adding...' : 'Add Crop'}
+                {loading ? t('addCrop.adding') : t('addCrop.addBtn')}
               </button>
             </div>
           </form>

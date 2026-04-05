@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../../utils/api';
 import Navbar from '../Navbar/Navbar';
 import './BrowseCrops.css';
 
-// ── Star rating display ───────────────────────────────────────────────────────
 const StarRating = ({ rating, totalReviews }) => {
   const filled = Math.round(rating);
   return (
@@ -24,6 +24,7 @@ const StarRating = ({ rating, totalReviews }) => {
 
 const BrowseCrops = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -68,7 +69,7 @@ const BrowseCrops = () => {
         <Navbar />
         <div className="loading-container">
           <div className="spinner"></div>
-          <p>Loading crops...</p>
+          <p>{t('browseCrops.loading')}</p>
         </div>
       </div>
     );
@@ -81,8 +82,8 @@ const BrowseCrops = () => {
       <div className="browse-container">
         <div className="browse-header">
           <div>
-            <h1 className="page-title">Browse Crops 🛒</h1>
-            <p className="page-subtitle">Fresh produce directly from farmers across India.</p>
+            <h1 className="page-title">{t('browseCrops.title')}</h1>
+            <p className="page-subtitle">{t('browseCrops.subtitle')}</p>
           </div>
         </div>
 
@@ -94,7 +95,7 @@ const BrowseCrops = () => {
               className={`filter-btn ${filter === category ? 'active' : ''}`}
               onClick={() => setFilter(category)}
             >
-              {category === 'all' ? 'All Crops' : category}
+              {category === 'all' ? t('browseCrops.allCrops') : category}
             </button>
           ))}
         </div>
@@ -102,7 +103,7 @@ const BrowseCrops = () => {
         {/* Crops Grid */}
         {filteredCrops.length === 0 ? (
           <div className="empty-state">
-            <p>No crops found in this category.</p>
+            <p>{t('browseCrops.noCrops')}</p>
           </div>
         ) : (
           <div className="crops-grid">
@@ -114,18 +115,23 @@ const BrowseCrops = () => {
                 <div className="crop-details">
                   <h3 className="crop-name">{crop.name}</h3>
                   <p className="crop-category">{crop.category} · {crop.state}</p>
-                  <p className="crop-price">₹{crop.price}/kg</p>
+                  <p className="crop-price">
+                    {t('browseCrops.price', { price: crop.price })}
+                  </p>
 
                   <div className="crop-meta">
                     <span className={`crop-status ${crop.status === 'Available' ? 'available' : 'sold-out'}`}>
-                      {crop.status === 'Available' ? '✓' : '✕'} {crop.status}
+                      {crop.status === 'Available' ? '✓' : '✕'}{' '}
+                      {crop.status === 'Available'
+                        ? t('browseCrops.available')
+                        : t('browseCrops.soldOut')}
                     </span>
                     <p className="crop-farmer">
-                      Qty: {crop.quantity} kg · By {crop.farmerName}
+                      {t('browseCrops.qty', { qty: crop.quantity, farmer: crop.farmerName })}
                     </p>
                   </div>
 
-                  {/* ── Farmer Rating ── */}
+                  {/* Farmer Rating — kept as-is, no translation needed for stars */}
                   <StarRating
                     rating={crop.farmerAvgRating ?? 0}
                     totalReviews={crop.farmerTotalReviews ?? 0}
@@ -136,7 +142,7 @@ const BrowseCrops = () => {
                     onClick={() => handleOrderNow(crop._id)}
                     disabled={crop.status === 'Sold Out'}
                   >
-                    Order Now
+                    {t('browseCrops.orderNow')}
                   </button>
                 </div>
               </div>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import api from '../../utils/api';
 import Navbar from '../Navbar/Navbar';
 import './FarmerDashboard.css';
 
-// ── Reusable star display ─────────────────────────────────────────────────────
 const StarDisplay = ({ value }) => (
   <div className="star-display">
     {[1, 2, 3, 4, 5].map((s) => (
@@ -17,6 +17,7 @@ const StarDisplay = ({ value }) => (
 const FarmerDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [stats, setStats] = useState({
     totalCrops: 0,
     activeCrops: 0,
@@ -40,19 +41,15 @@ const FarmerDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch farmer's crops
       const cropsRes = await api.get('/crops/farmer/my-crops');
       const crops = cropsRes.data;
 
-      // Fetch farmer's orders
       const ordersRes = await api.get('/orders/farmer/orders');
       const orders = ordersRes.data;
 
-      // Fetch farmer's rating stats from reviews
       const reviewRes = await api.get(`/reviews/farmer/${user._id}`);
       const { avgRating, avgQualityRating, avgCostRating, totalReviews } = reviewRes.data;
 
-      // Calculate stats
       const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
       const activeCrops = crops.filter(c => c.status === 'Available').length;
       const pendingOrders = orders.filter(o => o.status === 'pending').length;
@@ -82,11 +79,11 @@ const FarmerDashboard = () => {
   };
 
   const getRatingBadge = (score) => {
-    if (score >= 4.5) return { label: 'Top Rated ⭐', color: '#15803d', bg: '#dcfce7' };
-    if (score >= 4.0) return { label: 'Highly Rated', color: '#0369a1', bg: '#e0f2fe' };
-    if (score >= 3.0) return { label: 'Good',         color: '#92400e', bg: '#fef3c7' };
-    if (score > 0)    return { label: 'Getting Started', color: '#6b7280', bg: '#f3f4f6' };
-    return              { label: 'No Reviews Yet',    color: '#6b7280', bg: '#f3f4f6' };
+    if (score >= 4.5) return { label: t('farmerDashboard.topRated'),       color: '#15803d', bg: '#dcfce7' };
+    if (score >= 4.0) return { label: t('farmerDashboard.highlyRated'),     color: '#0369a1', bg: '#e0f2fe' };
+    if (score >= 3.0) return { label: t('farmerDashboard.good'),            color: '#92400e', bg: '#fef3c7' };
+    if (score > 0)    return { label: t('farmerDashboard.gettingStarted'),  color: '#6b7280', bg: '#f3f4f6' };
+    return              { label: t('farmerDashboard.noReviewsYet'),         color: '#6b7280', bg: '#f3f4f6' };
   };
 
   const badge = getRatingBadge(ratingStats.avgRating);
@@ -111,7 +108,7 @@ const FarmerDashboard = () => {
         <Navbar />
         <div className="loading-container">
           <div className="spinner"></div>
-          <p>Loading dashboard...</p>
+          <p>{t('farmerDashboard.loading')}</p>
         </div>
       </div>
     );
@@ -124,11 +121,13 @@ const FarmerDashboard = () => {
       <div className="dashboard-container">
         <div className="dashboard-header">
           <div className="header-left">
-            <h1 className="welcome-title">Hello, {user?.name} 🌾</h1>
-            <p className="welcome-subtitle">Welcome to your AgriConnect Farmer Dashboard.</p>
+            <h1 className="welcome-title">
+              {t('farmerDashboard.hello', { name: user?.name })}
+            </h1>
+            <p className="welcome-subtitle">{t('farmerDashboard.subtitle')}</p>
           </div>
           <button className="btn-add-crop" onClick={() => navigate('/farmer/crops/new')}>
-            + Add New Crop
+            {t('farmerDashboard.addNewCrop')}
           </button>
         </div>
 
@@ -138,7 +137,7 @@ const FarmerDashboard = () => {
             <div className="stat-icon crop-icon">🌾</div>
             <div className="stat-info">
               <h3 className="stat-number">{stats.totalCrops}</h3>
-              <p className="stat-label">Total Crops</p>
+              <p className="stat-label">{t('farmerDashboard.totalCrops')}</p>
             </div>
           </div>
 
@@ -146,7 +145,7 @@ const FarmerDashboard = () => {
             <div className="stat-icon active-icon">✅</div>
             <div className="stat-info">
               <h3 className="stat-number">{stats.activeCrops}</h3>
-              <p className="stat-label">Active Listings</p>
+              <p className="stat-label">{t('farmerDashboard.activeListings')}</p>
             </div>
           </div>
 
@@ -154,7 +153,7 @@ const FarmerDashboard = () => {
             <div className="stat-icon order-icon">📦</div>
             <div className="stat-info">
               <h3 className="stat-number">{stats.totalOrders}</h3>
-              <p className="stat-label">Total Orders</p>
+              <p className="stat-label">{t('farmerDashboard.totalOrders')}</p>
             </div>
           </div>
 
@@ -162,7 +161,7 @@ const FarmerDashboard = () => {
             <div className="stat-icon pending-icon">⏳</div>
             <div className="stat-info">
               <h3 className="stat-number">{stats.pendingOrders}</h3>
-              <p className="stat-label">Pending Orders</p>
+              <p className="stat-label">{t('farmerDashboard.pendingOrders')}</p>
             </div>
           </div>
 
@@ -170,23 +169,26 @@ const FarmerDashboard = () => {
             <div className="stat-icon revenue-icon">💰</div>
             <div className="stat-info">
               <h3 className="stat-number">₹{stats.totalRevenue.toLocaleString()}</h3>
-              <p className="stat-label">Total Revenue</p>
+              <p className="stat-label">{t('farmerDashboard.totalRevenue')}</p>
             </div>
           </div>
         </div>
 
-        {/* ── Rating Overview Card ───────────────────────────────────────────── */}
+        {/* Rating Overview Card */}
         <div className="rating-overview-card">
           <div className="rating-overview-left">
-            <h2 className="section-title">Your Farmer Rating</h2>
-            <p className="rating-overview-sub">Based on buyer reviews across all orders</p>
+            <h2 className="section-title">{t('farmerDashboard.yourRating')}</h2>
+            <p className="rating-overview-sub">{t('farmerDashboard.ratingSubtitle')}</p>
 
             <div className="rating-big-row">
               <span className="rating-big-number">{ratingStats.avgRating.toFixed(1)}</span>
               <div>
                 <StarDisplay value={ratingStats.avgRating} />
                 <span className="rating-total-reviews">
-                  {ratingStats.totalReviews} review{ratingStats.totalReviews !== 1 ? 's' : ''}
+                  {ratingStats.totalReviews}{' '}
+                  {ratingStats.totalReviews !== 1
+                    ? t('farmerDashboard.reviews')
+                    : t('farmerDashboard.review')}
                 </span>
               </div>
               <span
@@ -199,9 +201,8 @@ const FarmerDashboard = () => {
           </div>
 
           <div className="rating-overview-right">
-            {/* Quality Rating Bar */}
             <div className="rating-bar-row">
-              <span className="rbar-label">🌾 Crop Quality</span>
+              <span className="rbar-label">🌾 {t('farmerDashboard.cropQuality')}</span>
               <div className="rbar-track">
                 <div
                   className="rbar-fill"
@@ -216,9 +217,8 @@ const FarmerDashboard = () => {
               </span>
             </div>
 
-            {/* Cost Rating Bar */}
             <div className="rating-bar-row">
-              <span className="rbar-label">💰 Cost & Value</span>
+              <span className="rbar-label">💰 {t('farmerDashboard.costValue')}</span>
               <div className="rbar-track">
                 <div
                   className="rbar-fill"
@@ -234,24 +234,22 @@ const FarmerDashboard = () => {
             </div>
           </div>
         </div>
-        {/* ─────────────────────────────────────────────────────────────────── */}
 
         {/* Two Column Layout */}
         <div className="dashboard-content">
-          {/* My Crops Section */}
           <div className="section-card">
             <div className="section-header">
-              <h2 className="section-title">My Crops</h2>
+              <h2 className="section-title">{t('farmerDashboard.myCrops')}</h2>
               <button className="btn-view-all" onClick={() => navigate('/farmer/crops')}>
-                View All →
+                {t('farmerDashboard.viewAll')}
               </button>
             </div>
 
             {recentCrops.length === 0 ? (
               <div className="empty-state">
-                <p>No crops listed yet.</p>
+                <p>{t('farmerDashboard.noCrops')}</p>
                 <button className="btn-add" onClick={() => navigate('/farmer/crops/new')}>
-                  Add Your First Crop
+                  {t('farmerDashboard.addFirstCrop')}
                 </button>
               </div>
             ) : (
@@ -266,7 +264,9 @@ const FarmerDashboard = () => {
                       </p>
                     </div>
                     <span className={`status-badge ${crop.status === 'Available' ? 'available' : 'sold-out'}`}>
-                      {crop.status}
+                      {crop.status === 'Available'
+                        ? t('farmerDashboard.available')
+                        : t('farmerDashboard.soldOut')}
                     </span>
                   </div>
                 ))}
@@ -274,18 +274,17 @@ const FarmerDashboard = () => {
             )}
           </div>
 
-          {/* Recent Orders Section */}
           <div className="section-card">
             <div className="section-header">
-              <h2 className="section-title">Recent Orders</h2>
+              <h2 className="section-title">{t('farmerDashboard.recentOrders')}</h2>
               <button className="btn-view-all" onClick={() => navigate('/farmer/orders')}>
-                View All →
+                {t('farmerDashboard.viewAll')}
               </button>
             </div>
 
             {recentOrders.length === 0 ? (
               <div className="empty-state">
-                <p>No orders received yet.</p>
+                <p>{t('farmerDashboard.noOrders')}</p>
               </div>
             ) : (
               <div className="orders-list">
@@ -313,19 +312,19 @@ const FarmerDashboard = () => {
 
         {/* Quick Actions */}
         <div className="quick-actions">
-          <h2 className="section-title">Quick Actions</h2>
+          <h2 className="section-title">{t('farmerDashboard.quickActions')}</h2>
           <div className="actions-grid">
             <button className="action-card" onClick={() => navigate('/farmer/crops/new')}>
               <span className="action-icon">➕</span>
-              <span className="action-label">Add New Crop</span>
+              <span className="action-label">{t('farmerDashboard.addNewCrop')}</span>
             </button>
             <button className="action-card" onClick={() => navigate('/farmer/crops')}>
               <span className="action-icon">📝</span>
-              <span className="action-label">Manage Crops</span>
+              <span className="action-label">{t('farmerDashboard.manageCrops')}</span>
             </button>
             <button className="action-card" onClick={() => navigate('/farmer/orders')}>
               <span className="action-icon">📦</span>
-              <span className="action-label">View Orders</span>
+              <span className="action-label">{t('farmerDashboard.viewOrders')}</span>
             </button>
           </div>
         </div>
