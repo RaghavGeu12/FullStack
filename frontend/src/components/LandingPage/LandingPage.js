@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './LandingPage.css';
 import LoginModal from '../LoginModal/LoginModal';
+import LanguageSwitcher from '../LanguageSwitcher';
 import logo from '../../assets/logo.png';
 
 const LandingPage = () => {
@@ -24,6 +25,10 @@ const LandingPage = () => {
       <header className="landing-header">
         <div className="header-container">
           <img src={logo} alt="AgriConnect Logo" className="logo" />
+          {/* ✅ Language switcher added to landing page header */}
+          <div className="header-lang-switcher">
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
 

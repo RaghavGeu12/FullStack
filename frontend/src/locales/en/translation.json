@@ -64,7 +64,11 @@
     "qty": "Qty: {{qty}} kg · By {{farmer}}",
     "orderNow": "Order Now",
     "available": "Available",
-    "soldOut": "Sold Out"
+    "soldOut": "Sold Out",
+    "farmerContact": "Farmer Contact",
+    "showNumber": "Show Number",
+    "hideNumber": "Hide Number",
+    "noPhone": "Not provided"
   },
   "buyerDashboard": {
     "hello": "Hello, {{name}} 🛒",

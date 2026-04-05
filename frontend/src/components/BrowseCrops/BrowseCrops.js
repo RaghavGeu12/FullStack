@@ -28,6 +28,7 @@ const BrowseCrops = () => {
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [revealedPhones, setRevealedPhones] = useState({}); // ✅ tracks which cards show phone
 
   useEffect(() => {
     fetchCrops();
@@ -52,6 +53,11 @@ const BrowseCrops = () => {
 
   const handleOrderNow = (cropId) => {
     navigate(`/buyer/order/${cropId}`);
+  };
+
+  // ✅ Toggle phone reveal per crop card
+  const togglePhone = (cropId) => {
+    setRevealedPhones(prev => ({ ...prev, [cropId]: !prev[cropId] }));
   };
 
   const getCropEmoji = (name) => {
@@ -131,11 +137,38 @@ const BrowseCrops = () => {
                     </p>
                   </div>
 
-                  {/* Farmer Rating — kept as-is, no translation needed for stars */}
                   <StarRating
                     rating={crop.farmerAvgRating ?? 0}
                     totalReviews={crop.farmerTotalReviews ?? 0}
                   />
+
+                  {/* ✅ Farmer Contact Section */}
+                  <div className="farmer-contact">
+                    <div className="farmer-contact-header">
+                      <span className="farmer-contact-label">📞 {t('browseCrops.farmerContact')}</span>
+                      {crop.farmer?.phone ? (
+                        <button
+                          className="reveal-phone-btn"
+                          onClick={() => togglePhone(crop._id)}
+                        >
+                          {revealedPhones[crop._id]
+                            ? t('browseCrops.hideNumber')
+                            : t('browseCrops.showNumber')}
+                        </button>
+                      ) : (
+                        <span className="no-phone">{t('browseCrops.noPhone')}</span>
+                      )}
+                    </div>
+
+                    {revealedPhones[crop._id] && crop.farmer?.phone && (
+                      <a
+                        href={`tel:${crop.farmer.phone}`}
+                        className="phone-number"
+                      >
+                        📱 {crop.farmer.phone}
+                      </a>
+                    )}
+                  </div>
 
                   <button
                     className="btn-order"

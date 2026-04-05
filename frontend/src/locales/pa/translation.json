@@ -64,7 +64,11 @@
     "qty": "ਮਾਤਰਾ: {{qty}} ਕਿੱਲੋ · ਦੁਆਰਾ {{farmer}}",
     "orderNow": "ਹੁਣੇ ਆਰਡਰ ਕਰੋ",
     "available": "ਉਪਲਬਧ",
-    "soldOut": "ਵਿਕ ਗਿਆ"
+    "soldOut": "ਵਿਕ ਗਿਆ",
+    "farmerContact": "ਕਿਸਾਨ ਸੰਪਰਕ",
+    "showNumber": "ਨੰਬਰ ਦਿਖਾਓ",
+    "hideNumber": "ਨੰਬਰ ਲੁਕਾਓ",
+    "noPhone": "ਉਪਲਬਧ ਨਹੀਂ"
   },
   "buyerDashboard": {
     "hello": "ਸਤ ਸ੍ਰੀ ਅਕਾਲ, {{name}} 🛒",

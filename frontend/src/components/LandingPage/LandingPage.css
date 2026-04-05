@@ -22,14 +22,48 @@
   z-index: 1000;
 }
 
+/* ✅ FIXED: header-container is now flex so logo + switcher sit side by side */
 .header-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .logo {
   height: 60px;
+}
+
+/* ✅ NEW: Language switcher wrapper in the landing header */
+.header-lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-lang-switcher span {
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.header-lang-switcher select {
+  background: #ffffff;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.header-lang-switcher select:hover,
+.header-lang-switcher select:focus {
+  border-color: #4a9b7f;
 }
 
 /* Hero Section */
@@ -312,12 +346,20 @@
     max-width: 400px;
   }
 
+  /* ✅ FIXED: keep logo + switcher side by side on mobile too */
   .header-container {
     padding: 0 20px;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .logo {
     height: 50px;
+  }
+
+  .header-lang-switcher select {
+    font-size: 12px;
+    padding: 4px 8px;
   }
 
   .services-section {
