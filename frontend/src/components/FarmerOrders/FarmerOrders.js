@@ -11,6 +11,11 @@ const FarmerOrders = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
 
+  // Decline modal state
+  const [declineModal, setDeclineModal] = useState({ open: false, orderId: null });
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [declining, setDeclining] = useState(false);
+
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -33,6 +38,38 @@ const FarmerOrders = () => {
       fetchOrders();
     } catch (error) {
       toast.error(t('farmerOrders.errorUpdate'));
+    }
+  };
+
+  const openDeclineModal = (orderId) => {
+    setDeclineModal({ open: true, orderId });
+    setRejectionReason('');
+  };
+
+  const closeDeclineModal = () => {
+    setDeclineModal({ open: false, orderId: null });
+    setRejectionReason('');
+  };
+
+  const handleDeclineSubmit = async () => {
+    if (!rejectionReason.trim()) {
+      toast.error('Please provide a reason for declining the order.');
+      return;
+    }
+
+    setDeclining(true);
+    try {
+      await api.put(`/orders/${declineModal.orderId}/status`, {
+        status: 'cancelled',
+        rejectionReason: rejectionReason.trim()
+      });
+      toast.success('Order declined successfully.');
+      closeDeclineModal();
+      fetchOrders();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'Failed to decline order.');
+    } finally {
+      setDeclining(false);
     }
   };
 
@@ -147,12 +184,20 @@ const FarmerOrders = () => {
                     <td>
                       <div className="action-buttons">
                         {order.status === 'pending' && (
-                          <button
-                            className="btn-confirm"
-                            onClick={() => handleUpdateStatus(order._id, 'confirmed')}
-                          >
-                            {t('farmerOrders.confirm')}
-                          </button>
+                          <>
+                            <button
+                              className="btn-confirm"
+                              onClick={() => handleUpdateStatus(order._id, 'confirmed')}
+                            >
+                              {t('farmerOrders.confirm')}
+                            </button>
+                            <button
+                              className="btn-decline"
+                              onClick={() => openDeclineModal(order._id)}
+                            >
+                              Decline
+                            </button>
+                          </>
                         )}
                         {order.status === 'confirmed' && (
                           <button
@@ -167,6 +212,9 @@ const FarmerOrders = () => {
                             {t('farmerOrders.done')}
                           </span>
                         )}
+                        {order.status === 'cancelled' && (
+                          <span className="declined-text">Declined</span>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -176,6 +224,41 @@ const FarmerOrders = () => {
           </div>
         )}
       </div>
+
+      {/* Decline Modal */}
+      {declineModal.open && (
+        <div className="modal-overlay" onClick={closeDeclineModal}>
+          <div className="decline-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Decline Order</h2>
+              <button className="modal-close" onClick={closeDeclineModal}>✕</button>
+            </div>
+            <div className="modal-body">
+              <p className="modal-description">
+                Please provide a reason for declining this order. This message will be visible to the buyer.
+              </p>
+              <label className="reason-label">Reason for Declining <span>*</span></label>
+              <textarea
+                className="reason-textarea"
+                rows={4}
+                placeholder="e.g. Crop is no longer available due to weather damage..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                maxLength={500}
+              />
+              <div className="char-count">{rejectionReason.length}/500</div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-cancel-modal" onClick={closeDeclineModal} disabled={declining}>
+                Cancel
+              </button>
+              <button className="btn-decline-confirm" onClick={handleDeclineSubmit} disabled={declining}>
+                {declining ? 'Declining...' : 'Decline Order'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

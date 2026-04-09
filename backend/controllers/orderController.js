@@ -1,29 +1,27 @@
 const Order = require('../models/Order');
 const Crop = require('../models/Crop');
 
-// @desc    Create new order
-// @route   POST /api/orders
-// @access  Private (Buyer only)
+
 const createOrder = async (req, res) => {
   try {
     const { cropId, quantity, deliveryAddress } = req.body;
 
-    // Get crop details
+    
     const crop = await Crop.findById(cropId).populate('farmer', 'name');
 
     if (!crop) {
       return res.status(404).json({ message: 'Crop not found' });
     }
 
-    // Check if enough quantity available
+    
     if (crop.quantity < quantity) {
       return res.status(400).json({ message: 'Insufficient quantity available' });
     }
 
-    // Calculate total price
+   
     const totalPrice = crop.price * quantity;
 
-    // Create order
+  
     const order = await Order.create({
       buyer: req.user._id,
       buyerName: req.user.name,
@@ -36,7 +34,7 @@ const createOrder = async (req, res) => {
       deliveryAddress
     });
 
-    // Update crop quantity
+   
     crop.quantity -= quantity;
     if (crop.quantity === 0) {
       crop.status = 'Sold Out';
@@ -49,9 +47,7 @@ const createOrder = async (req, res) => {
   }
 };
 
-// @desc    Get buyer's orders
-// @route   GET /api/orders/my-orders
-// @access  Private (Buyer only)
+
 const getBuyerOrders = async (req, res) => {
   try {
     const orders = await Order.find({ buyer: req.user._id })
@@ -63,9 +59,7 @@ const getBuyerOrders = async (req, res) => {
   }
 };
 
-// @desc    Get farmer's orders
-// @route   GET /api/orders/farmer/orders
-// @access  Private (Farmer only)
+
 const getFarmerOrders = async (req, res) => {
   try {
     const orders = await Order.find({ farmer: req.user._id })
@@ -78,9 +72,7 @@ const getFarmerOrders = async (req, res) => {
   }
 };
 
-// @desc    Get single order
-// @route   GET /api/orders/:id
-// @access  Private
+
 const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
@@ -92,7 +84,7 @@ const getOrderById = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Make sure user is buyer or farmer of this order
+  
     if (
       order.buyer.toString() !== req.user._id.toString() &&
       order.farmer.toString() !== req.user._id.toString()
@@ -106,23 +98,42 @@ const getOrderById = async (req, res) => {
   }
 };
 
-// @desc    Update order status
-// @route   PUT /api/orders/:id/status
-// @access  Private (Farmer only)
+
 const updateOrderStatus = async (req, res) => {
   try {
+    const { status, rejectionReason } = req.body;
+
     const order = await Order.findById(req.params.id);
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Make sure user is the farmer of this order
+    
     if (order.farmer.toString() !== req.user._id.toString()) {
       return res.status(401).json({ message: 'Not authorized to update this order' });
     }
 
-    order.status = req.body.status || order.status;
+   
+    if (status === 'cancelled') {
+      if (!rejectionReason || rejectionReason.trim() === '') {
+        return res.status(400).json({ message: 'A rejection reason is required when declining an order' });
+      }
+
+      // Restore crop quantity when order is declined
+      const crop = await Crop.findById(order.crop);
+      if (crop) {
+        crop.quantity += order.quantity;
+        if (crop.status === 'Sold Out' && crop.quantity > 0) {
+          crop.status = 'Available';
+        }
+        await crop.save();
+      }
+
+      order.rejectionReason = rejectionReason.trim();
+    }
+
+    order.status = status || order.status;
     const updatedOrder = await order.save();
 
     res.json(updatedOrder);
@@ -131,13 +142,11 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-// @desc    Get order statistics for buyer
-// @route   GET /api/orders/stats/buyer
-// @access  Private (Buyer only)
+
 const getBuyerStats = async (req, res) => {
   try {
     const orders = await Order.find({ buyer: req.user._id });
-    
+
     const stats = {
       ordersPlaced: orders.length,
       completed: orders.filter(o => o.status === 'completed').length,

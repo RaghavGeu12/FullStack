@@ -75,6 +75,14 @@
   color: var(--primary-green);
 }
 
+/* Status cell with toggle */
+.status-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
 .status-badge {
   display: inline-block;
   padding: 6px 14px;
@@ -102,6 +110,60 @@
 .status-badge.cancelled {
   background: #ffebee;
   color: #c62828;
+}
+
+/* "See reason" toggle button */
+.reason-toggle {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #c62828;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.reason-toggle:hover {
+  color: #b71c1c;
+}
+
+/* Rejection reason expandable row */
+.rejection-row td {
+  padding: 0 20px 16px;
+  background: transparent;
+}
+
+.rejection-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #fff5f5;
+  border: 1.5px solid #ffcdd2;
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+
+.rejection-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.rejection-banner strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: #c62828;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.rejection-banner p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
 }
 
 .pagination {

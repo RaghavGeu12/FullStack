@@ -64,7 +64,11 @@
     "qty": "मात्रा: {{qty}} किलो · द्वारा {{farmer}}",
     "orderNow": "अभी ऑर्डर करें",
     "available": "उपलब्ध",
-    "soldOut": "बिक गया"
+    "soldOut": "बिक गया",
+    "farmerContact": "किसान संपर्क",
+    "showNumber": "नंबर दिखाएं",
+    "hideNumber": "नंबर छुपाएं",
+    "noPhone": "उपलब्ध नहीं"
   },
   "buyerDashboard": {
     "hello": "नमस्ते, {{name}} 🛒",

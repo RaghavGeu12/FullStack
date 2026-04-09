@@ -8,6 +8,7 @@ const MyOrders = () => {
   const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedReason, setExpandedReason] = useState(null);
 
   useEffect(() => {
     fetchOrders();
@@ -79,19 +80,52 @@ const MyOrders = () => {
               </thead>
               <tbody>
                 {orders.map((order) => (
-                  <tr key={order._id}>
-                    <td className="order-id">{order.orderId}</td>
-                    <td className="crop-name">{order.cropName}</td>
-                    <td>{t('myOrders.quantityKg', { qty: order.quantity })}</td>
-                    <td className="total-price">₹{order.totalPrice.toLocaleString()}</td>
-                    <td>{order.farmerName}</td>
-                    <td>{formatDate(order.orderDate)}</td>
-                    <td>
-                      <span className={`status-badge ${order.status}`}>
-                        {order.status}
-                      </span>
-                    </td>
-                  </tr>
+                  <React.Fragment key={order._id}>
+                    <tr>
+                      <td className="order-id">{order.orderId}</td>
+                      <td className="crop-name">{order.cropName}</td>
+                      <td>{t('myOrders.quantityKg', { qty: order.quantity })}</td>
+                      <td className="total-price">₹{order.totalPrice.toLocaleString()}</td>
+                      <td>{order.farmerName}</td>
+                      <td>{formatDate(order.orderDate)}</td>
+                      <td>
+                        <div className="status-cell">
+                          <span className={`status-badge ${order.status}`}>
+                            {order.status}
+                          </span>
+                          {order.status === 'cancelled' && order.rejectionReason && (
+                            <button
+                              className="reason-toggle"
+                              onClick={() =>
+                                setExpandedReason(
+                                  expandedReason === order._id ? null : order._id
+                                )
+                              }
+                            >
+                              {expandedReason === order._id ? 'Hide reason ▲' : 'See reason ▼'}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* Rejection reason row */}
+                    {order.status === 'cancelled' &&
+                      order.rejectionReason &&
+                      expandedReason === order._id && (
+                        <tr className="rejection-row">
+                          <td colSpan={7}>
+                            <div className="rejection-banner">
+                              <span className="rejection-icon">⚠️</span>
+                              <div>
+                                <strong>Reason for rejection:</strong>
+                                <p>{order.rejectionReason}</p>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
