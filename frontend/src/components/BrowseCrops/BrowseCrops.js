@@ -28,8 +28,8 @@ const BrowseCrops = () => {
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-  const [revealedPhones, setRevealedPhones] = useState({}); // ✅ tracks which cards show phone
-
+  const [revealedPhones, setRevealedPhones] = useState({}); 
+  
   useEffect(() => {
     fetchCrops();
   }, []);
@@ -55,7 +55,7 @@ const BrowseCrops = () => {
     navigate(`/buyer/order/${cropId}`);
   };
 
-  // ✅ Toggle phone reveal per crop card
+  
   const togglePhone = (cropId) => {
     setRevealedPhones(prev => ({ ...prev, [cropId]: !prev[cropId] }));
   };
@@ -93,7 +93,7 @@ const BrowseCrops = () => {
           </div>
         </div>
 
-        {/* Category Filters */}
+        
         <div className="filter-section">
           {categories.map((category) => (
             <button
@@ -106,7 +106,7 @@ const BrowseCrops = () => {
           ))}
         </div>
 
-        {/* Crops Grid */}
+       
         {filteredCrops.length === 0 ? (
           <div className="empty-state">
             <p>{t('browseCrops.noCrops')}</p>
@@ -142,7 +142,7 @@ const BrowseCrops = () => {
                     totalReviews={crop.farmerTotalReviews ?? 0}
                   />
 
-                  {/* ✅ Farmer Contact Section */}
+                  
                   <div className="farmer-contact">
                     <div className="farmer-contact-header">
                       <span className="farmer-contact-label">📞 {t('browseCrops.farmerContact')}</span>

@@ -3,31 +3,31 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-// Load env vars
+
 dotenv.config();
 
-// Connect to database
+
 connectDB();
 
 const app = express();
 
-// Middleware
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/crops', require('./routes/cropRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
 
-// Root route
+
 app.get('/', (req, res) => {
   res.json({ message: 'AgriConnect API is running' });
 });
 
-// Error handler
+
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode);

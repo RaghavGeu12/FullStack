@@ -96,7 +96,7 @@
   border-color: #ccc;
 }
 
-/* Side Menu */
+
 .side-menu {
   position: fixed;
   left: 0;
@@ -164,13 +164,12 @@
   font-size: 15px;
 }
 
-/* Add left margin to dashboard content */
+
 .buyer-dashboard .dashboard-container,
 .farmer-dashboard .dashboard-container {
   margin-left: 200px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .side-menu {
     transform: translateX(-100%);

@@ -18,7 +18,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-/* Orders Table */
+
 .orders-table-container {
   background: white;
   border-radius: 12px;
@@ -75,7 +75,7 @@
   color: var(--primary-green);
 }
 
-/* Status cell with toggle */
+
 .status-cell {
   display: flex;
   flex-direction: column;
@@ -112,7 +112,7 @@
   color: #c62828;
 }
 
-/* "See reason" toggle button */
+
 .reason-toggle {
   background: none;
   border: none;
@@ -129,7 +129,7 @@
   color: #b71c1c;
 }
 
-/* Rejection reason expandable row */
+
 .rejection-row td {
   padding: 0 20px 16px;
   background: transparent;
@@ -174,7 +174,6 @@
   font-weight: 600;
 }
 
-/* Empty State */
 .empty-state {
   background: white;
   border-radius: 12px;
@@ -199,7 +198,7 @@
   color: var(--text-light);
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .orders-container {
     margin-left: 0;

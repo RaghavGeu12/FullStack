@@ -120,7 +120,7 @@ const updateOrderStatus = async (req, res) => {
         return res.status(400).json({ message: 'A rejection reason is required when declining an order' });
       }
 
-      // Restore crop quantity when order is declined
+      
       const crop = await Crop.findById(order.crop);
       if (crop) {
         crop.quantity += order.quantity;

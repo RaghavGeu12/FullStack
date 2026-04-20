@@ -7,7 +7,8 @@ const {
   createCrop,
   updateCrop,
   deleteCrop,
-  getFarmerCrops
+  getFarmerCrops,
+  getSuggestedPrice  // ADDED
 } = require('../controllers/cropController');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -17,6 +18,7 @@ router.route('/')
 
 router.get('/featured', getFeaturedCrops);
 router.get('/farmer/my-crops', protect, authorize('farmer'), getFarmerCrops);
+router.get('/suggest-price', protect, authorize('farmer'), getSuggestedPrice); // ADDED
 
 router.route('/:id')
   .get(getCropById)

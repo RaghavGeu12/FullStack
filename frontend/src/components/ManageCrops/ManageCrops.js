@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import api from '../../utils/api';
 import Navbar from '../Navbar/Navbar';
+import { fetchSuggestedPrice } from '../../services/pricingApi'; // ADDED
 import './ManageCrops.css';
 
 const ManageCrops = () => {
@@ -12,6 +13,8 @@ const ManageCrops = () => {
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [priceSuggestions, setPriceSuggestions] = useState({});   // ADDED — stores suggestion per crop id
+  const [priceLoadingId, setPriceLoadingId] = useState(null);     // ADDED — tracks which card is loading
 
   useEffect(() => {
     fetchCrops();
@@ -49,6 +52,28 @@ const ManageCrops = () => {
     } catch (error) {
       toast.error(t('manageCrops.errorStatus'));
     }
+  };
+
+  // ADDED — fetch market price for a specific crop card
+  const handleCheckMarketPrice = async (crop) => {
+    if (!crop.harvestMonth) {
+      toast.info('This crop has no harvest month recorded. Market price unavailable.');
+      return;
+    }
+
+    setPriceLoadingId(crop._id);
+
+    // harvestMonth stored as "YYYY-MM", convert to full date for backend
+    const harvestDate = `${crop.harvestMonth}-01`;
+    const result = await fetchSuggestedPrice(crop.name, harvestDate);
+
+    if (result && result.suggestedPrice) {
+      setPriceSuggestions(prev => ({ ...prev, [crop._id]: result }));
+    } else {
+      toast.info('No market data available for this crop.');
+    }
+
+    setPriceLoadingId(null);
   };
 
   const filteredCrops = filter === 'all'
@@ -154,7 +179,43 @@ const ManageCrops = () => {
                   </div>
                   <p className="crop-location">📍 {crop.location}</p>
 
+                  {/* ADDED — harvest month display */}
+                  {crop.harvestMonth && (
+                    <p className="crop-harvest-month">
+                      🗓 Harvested: {new Date(`${crop.harvestMonth}-01`).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
+                    </p>
+                  )}
+
+                  {/* ADDED — market price suggestion result */}
+                  {priceSuggestions[crop._id] && (
+                    <div className="market-price-box">
+                      <div className="market-price-top">
+                        <span className="market-price-label">Current market price</span>
+                        <span className="market-price-amount">
+                          ₹{priceSuggestions[crop._id].suggestedPrice}
+                          <span className="market-price-unit"> / {crop.unit || 'kg'}</span>
+                        </span>
+                      </div>
+                      <span className="market-price-method">
+                        {priceSuggestions[crop._id].method}
+                      </span>
+                      {priceSuggestions[crop._id].basePrice !== priceSuggestions[crop._id].suggestedPrice && (
+                        <span className="market-price-base">
+                          Base ₹{priceSuggestions[crop._id].basePrice} + seasonal adjustment
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   <div className="crop-actions">
+                    {/* ADDED — check market price button */}
+                    <button
+                      className="btn-market-price"
+                      onClick={() => handleCheckMarketPrice(crop)}
+                      disabled={priceLoadingId === crop._id}
+                    >
+                      {priceLoadingId === crop._id ? 'Checking...' : '📊 Market Price'}
+                    </button>
                     <button
                       className="btn-toggle"
                       onClick={() => handleToggleStatus(crop._id, crop.status)}

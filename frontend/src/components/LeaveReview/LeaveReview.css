@@ -1,4 +1,4 @@
-/* ── Base ───────────────────────────────────────────── */
+
 .leave-review-page {
   min-height: 100vh;
   background: #f6f8f4;
@@ -11,7 +11,7 @@
   padding: 32px 20px 60px;
 }
 
-/* ── Header ─────────────────────────────────────────── */
+
 .review-header {
   margin-bottom: 32px;
 }
@@ -27,7 +27,7 @@
   font-size: 0.95rem;
 }
 
-/* ── Layout ─────────────────────────────────────────── */
+
 .review-content {
   display: grid;
   grid-template-columns: 380px 1fr;
@@ -35,7 +35,7 @@
   align-items: start;
 }
 
-/* ── Orders Section ─────────────────────────────────── */
+
 .orders-section {
   background: #fff;
   border-radius: 16px;
@@ -140,7 +140,7 @@
   margin-bottom: 12px;
 }
 
-/* ── Review Form Section ────────────────────────────── */
+
 .review-form-section {
   background: #fff;
   border-radius: 16px;
@@ -175,7 +175,7 @@
   border-radius: 20px;
 }
 
-/* ── Dual Ratings ───────────────────────────────────── */
+
 .ratings-group {
   background: #f8fbf8;
   border-radius: 12px;
@@ -255,7 +255,7 @@
   margin: 0 20px;
 }
 
-/* ── Overall Rating ─────────────────────────────────── */
+
 .overall-rating {
   display: flex;
   align-items: center;
@@ -292,7 +292,7 @@
   font-size: 1.1rem;
 }
 
-/* ── Form Groups ────────────────────────────────────── */
+
 .form-group {
   margin-bottom: 20px;
   position: relative;
@@ -330,8 +330,8 @@
   font-size: 0.72rem;
   color: #a0b0a0;
 }
+ 
 
-/* ── Actions ────────────────────────────────────────── */
 .form-actions {
   display: flex;
   gap: 12px;
@@ -373,7 +373,7 @@
   cursor: not-allowed;
 }
 
-/* ── No Selection ───────────────────────────────────── */
+
 .no-selection {
   display: flex;
   flex-direction: column;
@@ -393,7 +393,7 @@
   text-align: center;
 }
 
-/* ── Loading ────────────────────────────────────────── */
+
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -415,7 +415,7 @@
   to { transform: rotate(360deg); }
 }
 
-/* ── Responsive ─────────────────────────────────────── */
+
 @media (max-width: 768px) {
   .review-content {
     grid-template-columns: 1fr;

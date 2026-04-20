@@ -108,7 +108,6 @@ const BuyerDashboard = () => {
           </div>
         </div>
 
-        {/* Featured Crops */}
         <div className="featured-section">
           <h2 className="section-title">{t('buyerDashboard.featuredCrops')}</h2>
 
@@ -169,7 +168,7 @@ const getCropEmoji = (name) => {
   const emojiMap = {
     'Wheat': '🌾', 'Rice': '🍚', 'Tomato': '🍅',
     'Mango': '🥭', 'Mustard': '🌼', 'Onion': '🧅',
-    'Potato': '🥔', 'Cotton': '☁️'
+    'Potato': '🥔', 'Cotton': '☁️','Banana':'🍌'
   };
   return emojiMap[name] || '🌱';
 };

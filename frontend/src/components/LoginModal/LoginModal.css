@@ -261,7 +261,7 @@
   text-align: center;
 }
 
-/* Responsive */
+
 @media (max-width: 576px) {
   .modal-header {
     padding: 30px 25px 20px;

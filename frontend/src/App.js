@@ -4,7 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Components
+
 import LandingPage from './components/LandingPage/LandingPage';
 import BuyerDashboard from './components/BuyerDashboard/BuyerDashboard';
 import BrowseCrops from './components/BrowseCrops/BrowseCrops';
@@ -16,7 +16,7 @@ import FarmerOrders from './components/FarmerOrders/FarmerOrders';
 import PlaceOrder from './components/PlaceOrder/PlaceOrder';
 import LeaveReview from './components/LeaveReview/LeaveReview';
 
-// Protected Route Component
+
 const ProtectedRoute = ({ children, allowedRole }) => {
   const { user, loading } = useAuth();
 
@@ -49,7 +49,7 @@ function AppRoutes() {
 
   return (
     <Routes>
-      {/* Public Route */}
+      
       <Route 
         path="/" 
         element={
@@ -61,7 +61,7 @@ function AppRoutes() {
         } 
       />
 
-      {/* Buyer Routes */}
+      
       <Route
         path="/buyer/dashboard"
         element={
@@ -103,7 +103,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Farmer Routes */}
+      
       <Route
         path="/farmer/dashboard"
         element={
@@ -137,7 +137,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Catch all */}
+     
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -145,7 +145,7 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>        {/* ✅ AuthProvider now wraps Router */}
+    <AuthProvider>        
       <Router>
         <div className="App">
           <AppRoutes />

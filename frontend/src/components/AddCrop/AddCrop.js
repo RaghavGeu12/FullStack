@@ -4,12 +4,15 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import api from '../../utils/api';
 import Navbar from '../Navbar/Navbar';
+import { fetchSuggestedPrice } from '../../services/pricingApi'; // ADDED
 import './AddCrop.css';
 
 const AddCrop = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [priceLoading, setPriceLoading] = useState(false);      // ADDED
+  const [priceSuggestion, setPriceSuggestion] = useState(null); // ADDED
   const [formData, setFormData] = useState({
     name: '',
     category: 'Grains',
@@ -18,7 +21,8 @@ const AddCrop = () => {
     unit: 'kg',
     location: '',
     state: '',
-    description: ''
+    description: '',
+    harvestMonth: '' // ADDED — format: "YYYY-MM"
   });
 
   const categories = ['Grains', 'Vegetables', 'Fruits', 'Oilseeds'];
@@ -32,6 +36,44 @@ const AddCrop = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Reset suggestion whenever crop name or harvest month changes
+    if (e.target.name === 'name' || e.target.name === 'harvestMonth') {
+      setPriceSuggestion(null); // ADDED
+    }
+  };
+
+  // ADDED — fetches suggested price from backend
+  const handleSuggestPrice = async () => {
+    if (!formData.name) {
+      toast.error('Please enter a crop name first');
+      return;
+    }
+    if (!formData.harvestMonth) {
+      toast.error('Please select the harvest month first');
+      return;
+    }
+
+    // Convert "YYYY-MM" to a full date string "YYYY-MM-01" for the backend
+    const harvestDate = `${formData.harvestMonth}-01`;
+
+    setPriceLoading(true);
+    setPriceSuggestion(null);
+
+    const result = await fetchSuggestedPrice(formData.name, harvestDate);
+
+    if (result && result.suggestedPrice) {
+      setPriceSuggestion(result);
+    } else {
+      toast.info('No market data found for this crop. Please enter price manually.');
+    }
+
+    setPriceLoading(false);
+  };
+
+  // ADDED — applies the suggested price into the price field
+  const handleApplyPrice = () => {
+    setFormData(prev => ({ ...prev, price: priceSuggestion.suggestedPrice }));
+    toast.success('Suggested price applied!');
   };
 
   const handleSubmit = async (e) => {
@@ -79,6 +121,8 @@ const AddCrop = () => {
 
         <div className="add-crop-card">
           <form onSubmit={handleSubmit} className="crop-form">
+
+            {/* Row 1 — crop name + category (unchanged) */}
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="name">{t('addCrop.cropName')}</label>
@@ -109,6 +153,85 @@ const AddCrop = () => {
               </div>
             </div>
 
+            {/* ADDED — Row 2: harvest month + suggest price button */}
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="harvestMonth">Harvest Month</label>
+                <input
+                  type="month"
+                  id="harvestMonth"
+                  name="harvestMonth"
+                  value={formData.harvestMonth}
+                  onChange={handleChange}
+                  max={new Date().toISOString().slice(0, 7)}
+                />
+                <span className="field-hint">
+                  When was this crop harvested? Used to calculate market price.
+                </span>
+              </div>
+
+              <div className="form-group suggest-price-group">
+                <label>Smart Price Suggestion</label>
+                <button
+                  type="button"
+                  className="btn-suggest-price"
+                  onClick={handleSuggestPrice}
+                  disabled={priceLoading}
+                >
+                  {priceLoading ? 'Checking market...' : 'Get Suggested Price'}
+                </button>
+                <span className="field-hint">
+                  Based on recent orders + seasonal adjustment
+                </span>
+              </div>
+            </div>
+
+            {/* ADDED — price suggestion result box */}
+            {priceSuggestion && (
+  <div className="price-suggestion-box">
+    <div className="price-suggestion-left">
+
+      {/* How price was sourced */}
+      <span className="suggestion-label">{priceSuggestion.method}</span>
+
+      {/* Final suggested price */}
+      <span className="suggestion-amount">
+        ₹{priceSuggestion.suggestedPrice}
+        <span className="suggestion-unit"> / {formData.unit}</span>
+      </span>
+
+      {/* Calculation breakdown */}
+      {priceSuggestion.breakdown ? (
+        <div className="suggestion-breakdown">
+          <span className="breakdown-row">
+            Base price &nbsp;<strong>₹{priceSuggestion.basePrice}</strong>
+          </span>
+          <span className="breakdown-row">
+            Seasonal increase &nbsp;
+            <strong>{priceSuggestion.breakdown}</strong>
+          </span>
+          <span className="breakdown-row breakdown-total">
+            Suggested &nbsp;<strong>₹{priceSuggestion.suggestedPrice}</strong>
+          </span>
+        </div>
+      ) : (
+        <span className="suggestion-base">
+          Harvested this month — no seasonal adjustment applied
+        </span>
+      )}
+
+    </div>
+    <button
+      type="button"
+      className="btn-apply-price"
+      onClick={handleApplyPrice}
+    >
+      Use this price
+    </button>
+  </div>
+)}
+
+            {/* Row 3 — price + quantity (unchanged) */}
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="price">{t('addCrop.price')}</label>
@@ -141,6 +264,7 @@ const AddCrop = () => {
               </div>
             </div>
 
+            {/* Row 4 — location + state (unchanged) */}
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="location">{t('addCrop.location')}</label>
@@ -172,6 +296,7 @@ const AddCrop = () => {
               </div>
             </div>
 
+            {/* Description (unchanged) */}
             <div className="form-group">
               <label htmlFor="description">{t('addCrop.description')}</label>
               <textarea
@@ -184,6 +309,7 @@ const AddCrop = () => {
               />
             </div>
 
+            {/* Form actions (unchanged) */}
             <div className="form-actions">
               <button
                 type="button"
@@ -200,6 +326,7 @@ const AddCrop = () => {
                 {loading ? t('addCrop.adding') : t('addCrop.addBtn')}
               </button>
             </div>
+
           </form>
         </div>
       </div>

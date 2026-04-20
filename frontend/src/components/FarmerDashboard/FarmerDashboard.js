@@ -131,7 +131,7 @@ const FarmerDashboard = () => {
           </button>
         </div>
 
-        {/* Stats Cards */}
+       
         <div className="stats-grid">
           <div className="stat-card">
             <div className="stat-icon crop-icon">🌾</div>
@@ -174,7 +174,7 @@ const FarmerDashboard = () => {
           </div>
         </div>
 
-        {/* Rating Overview Card */}
+      
         <div className="rating-overview-card">
           <div className="rating-overview-left">
             <h2 className="section-title">{t('farmerDashboard.yourRating')}</h2>
@@ -235,7 +235,7 @@ const FarmerDashboard = () => {
           </div>
         </div>
 
-        {/* Two Column Layout */}
+       
         <div className="dashboard-content">
           <div className="section-card">
             <div className="section-header">
@@ -310,7 +310,7 @@ const FarmerDashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
+       
         <div className="quick-actions">
           <h2 className="section-title">{t('farmerDashboard.quickActions')}</h2>
           <div className="actions-grid">

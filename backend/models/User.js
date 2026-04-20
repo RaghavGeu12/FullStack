@@ -44,11 +44,7 @@ const userSchema = new mongoose.Schema({
     default: 'Active'
   },
 
-  // ── Farmer rating averages (updated by aggregation pipeline after every review) ──
-  // Example: Buyer1 rates quality:3, cost:3 → Buyer2 rates quality:5, cost:5
-  //   avgQualityRating = (3+5)/2 = 4.0
-  //   avgCostRating    = (3+5)/2 = 4.0
-  //   avgRating        = (4.0+4.0)/2 = 4.0  ⭐⭐⭐⭐
+  
   avgRating: {
     type: Number,
     default: 0
@@ -72,7 +68,7 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-// Encrypt password before saving
+
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) {
     next();
@@ -81,7 +77,7 @@ userSchema.pre('save', async function(next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Compare password method
+
 userSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

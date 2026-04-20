@@ -1,4 +1,4 @@
-/* Reset and Base Styles */
+
 * {
   margin: 0;
   padding: 0;
@@ -11,7 +11,7 @@
   color: #333;
 }
 
-/* Header */
+
 .landing-header {
   background: #fff;
   padding: 15px 0;
@@ -22,7 +22,7 @@
   z-index: 1000;
 }
 
-/* ✅ FIXED: header-container is now flex so logo + switcher sit side by side */
+
 .header-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -36,7 +36,7 @@
   height: 60px;
 }
 
-/* ✅ NEW: Language switcher wrapper in the landing header */
+
 .header-lang-switcher {
   display: flex;
   align-items: center;
@@ -66,7 +66,7 @@
   border-color: #4a9b7f;
 }
 
-/* Hero Section */
+
 .hero-section {
   background: linear-gradient(135deg, #2d5f4f 0%, #4a9b7f 100%);
   min-height: 100vh;
@@ -88,7 +88,7 @@
   width: 100%;
 }
 
-/* Hero Badge */
+
 .hero-badge {
   width: 200px;
   height: 200px;
@@ -151,7 +151,7 @@
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Login Section */
+
 .login-section {
   display: flex;
   gap: 30px;
@@ -234,7 +234,7 @@
   transform: translateY(-2px);
 }
 
-/* Services Section */
+
 .services-section {
   padding: 80px 50px;
   background: #f8f9fa;
@@ -311,7 +311,6 @@
   text-align: justify;
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
   .service-item,
   .service-item.reverse {
@@ -346,7 +345,7 @@
     max-width: 400px;
   }
 
-  /* ✅ FIXED: keep logo + switcher side by side on mobile too */
+ 
   .header-container {
     padding: 0 20px;
     flex-wrap: wrap;

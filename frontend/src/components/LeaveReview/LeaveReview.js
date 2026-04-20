@@ -147,7 +147,7 @@ const LeaveReview = () => {
             )}
           </div>
 
-          {/* Review Form */}
+         
           <div className="review-form-section">
             {selectedOrder ? (
               <>
@@ -164,7 +164,7 @@ const LeaveReview = () => {
                 </div>
 
                 <form onSubmit={handleSubmitReview} className="review-form">
-                  {/* Dual Rating */}
+                  
                   <div className="form-group ratings-group">
                     <label className="group-label">{t('leaveReview.rateExperience')}</label>
                     <div className="dual-ratings">
@@ -185,7 +185,7 @@ const LeaveReview = () => {
                       />
                     </div>
 
-                    {/* Overall average pill */}
+                    
                     <div className="overall-rating">
                       <span className="overall-label">{t('leaveReview.overallRating')}</span>
                       <div className="overall-score">
@@ -199,7 +199,7 @@ const LeaveReview = () => {
                     </div>
                   </div>
 
-                  {/* Comment */}
+                 
                   <div className="form-group">
                     <label htmlFor="comment">{t('leaveReview.yourReview')}</label>
                     <textarea

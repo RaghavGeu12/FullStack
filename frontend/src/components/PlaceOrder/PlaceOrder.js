@@ -123,7 +123,7 @@ const PlaceOrder = () => {
             </div>
           </div>
 
-          {/* Order Form */}
+          
           <div className="order-form-card">
             <h3>{t('placeOrder.orderDetails')}</h3>
             <form onSubmit={handlePlaceOrder}>

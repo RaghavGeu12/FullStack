@@ -1,15 +1,12 @@
 const Crop = require('../models/Crop');
+const { suggestPrice } = require('../services/pricingEngine'); // ADDED
 
-// @desc    Get all crops (with farmer rating fields)
-// @route   GET /api/crops
-// @access  Public
+
 const getCrops = async (req, res) => {
   try {
     const crops = await Crop.find()
       .populate('farmer', 'name email phone avgRating avgQualityRating avgCostRating totalReviews');
 
-    // Flatten farmer rating fields onto each crop so frontend
-    // can access crop.farmerAvgRating directly without nested lookup
     const cropsWithRating = crops.map((crop) => ({
       ...crop.toObject(),
       farmerAvgRating:        crop.farmer?.avgRating        ?? 0,
@@ -24,9 +21,7 @@ const getCrops = async (req, res) => {
   }
 };
 
-// @desc    Get featured crops (limit to 6, with farmer rating fields)
-// @route   GET /api/crops/featured
-// @access  Public
+
 const getFeaturedCrops = async (req, res) => {
   try {
     const crops = await Crop.find({ status: 'Available' })
@@ -47,9 +42,7 @@ const getFeaturedCrops = async (req, res) => {
   }
 };
 
-// @desc    Get single crop (with farmer rating fields)
-// @route   GET /api/crops/:id
-// @access  Public
+
 const getCropById = async (req, res) => {
   try {
     const crop = await Crop.findById(req.params.id)
@@ -59,7 +52,6 @@ const getCropById = async (req, res) => {
       return res.status(404).json({ message: 'Crop not found' });
     }
 
-    // Flatten rating fields here too (useful for PlaceOrder page)
     const cropObj = {
       ...crop.toObject(),
       farmerAvgRating:        crop.farmer?.avgRating        ?? 0,
@@ -74,9 +66,7 @@ const getCropById = async (req, res) => {
   }
 };
 
-// @desc    Create new crop
-// @route   POST /api/crops
-// @access  Private (Farmer only)
+
 const createCrop = async (req, res) => {
   try {
     const { name, category, price, quantity, unit, location, state, description, image } = req.body;
@@ -101,9 +91,7 @@ const createCrop = async (req, res) => {
   }
 };
 
-// @desc    Update crop
-// @route   PUT /api/crops/:id
-// @access  Private (Farmer only)
+
 const updateCrop = async (req, res) => {
   try {
     const crop = await Crop.findById(req.params.id);
@@ -128,9 +116,7 @@ const updateCrop = async (req, res) => {
   }
 };
 
-// @desc    Delete crop
-// @route   DELETE /api/crops/:id
-// @access  Private (Farmer only)
+
 const deleteCrop = async (req, res) => {
   try {
     const crop = await Crop.findById(req.params.id);
@@ -150,9 +136,7 @@ const deleteCrop = async (req, res) => {
   }
 };
 
-// @desc    Get farmer's own crops
-// @route   GET /api/crops/farmer/my-crops
-// @access  Private (Farmer only)
+
 const getFarmerCrops = async (req, res) => {
   try {
     const crops = await Crop.find({ farmer: req.user._id });
@@ -162,6 +146,24 @@ const getFarmerCrops = async (req, res) => {
   }
 };
 
+
+// ADDED — dynamic pricing suggestion endpoint
+const getSuggestedPrice = async (req, res) => {
+  try {
+    const { cropName, harvestDate } = req.query;
+
+    if (!cropName || !harvestDate) {
+      return res.status(400).json({ message: 'cropName and harvestDate are required' });
+    }
+
+    const result = await suggestPrice(cropName, harvestDate);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 module.exports = {
   getCrops,
   getFeaturedCrops,
@@ -169,5 +171,6 @@ module.exports = {
   createCrop,
   updateCrop,
   deleteCrop,
-  getFarmerCrops
+  getFarmerCrops,
+  getSuggestedPrice  // ADDED
 };

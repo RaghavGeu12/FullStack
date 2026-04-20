@@ -11,7 +11,7 @@ const FarmerOrders = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
 
-  // Decline modal state
+
   const [declineModal, setDeclineModal] = useState({ open: false, orderId: null });
   const [rejectionReason, setRejectionReason] = useState('');
   const [declining, setDeclining] = useState(false);
@@ -225,7 +225,7 @@ const FarmerOrders = () => {
         )}
       </div>
 
-      {/* Decline Modal */}
+      
       {declineModal.open && (
         <div className="modal-overlay" onClick={closeDeclineModal}>
           <div className="decline-modal" onClick={(e) => e.stopPropagation()}>

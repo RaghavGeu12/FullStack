@@ -25,7 +25,6 @@ const LandingPage = () => {
       <header className="landing-header">
         <div className="header-container">
           <img src={logo} alt="AgriConnect Logo" className="logo" />
-          {/* ✅ Language switcher added to landing page header */}
           <div className="header-lang-switcher">
             <LanguageSwitcher />
           </div>

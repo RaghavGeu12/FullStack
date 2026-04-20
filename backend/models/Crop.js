@@ -38,6 +38,10 @@ const cropSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  harvestMonth: {        // ADDED — stored as "YYYY-MM", e.g. "2025-02"
+    type: String,
+    default: ''
+  },
   image: {
     type: String,
     default: ''

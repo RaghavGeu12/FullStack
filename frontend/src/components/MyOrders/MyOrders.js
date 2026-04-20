@@ -109,7 +109,7 @@ const MyOrders = () => {
                       </td>
                     </tr>
 
-                    {/* Rejection reason row */}
+                   
                     {order.status === 'cancelled' &&
                       order.rejectionReason &&
                       expandedReason === order._id && (

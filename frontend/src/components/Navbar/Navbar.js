@@ -32,7 +32,7 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Top Navbar */}
+      
       <nav className="top-navbar">
         <div className="navbar-container">
           <Link to={basePath + '/dashboard'} className="navbar-logo">
@@ -60,7 +60,6 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Side Menu */}
       <aside className="side-menu">
         <div className="menu-label">MENU</div>
         <nav className="menu-nav">

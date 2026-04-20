@@ -60,7 +60,7 @@ const orderSchema = new mongoose.Schema({
   }
 });
 
-// Generate unique order ID before saving
+
 orderSchema.pre('save', async function(next) {
   if (!this.orderId) {
     const count = await this.constructor.countDocuments();
